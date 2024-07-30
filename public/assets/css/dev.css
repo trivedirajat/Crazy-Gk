@@ -1,0 +1,57 @@
+.theme-fa-icon{
+
+    color: #4466f2;
+    cursor: pointer;
+    font-size: 20px;
+}
+.cardText {
+    font-size: 16px;
+    font-weight: 400;
+}
+.breadcrumb-item{
+    cursor: pointer;
+}
+.sidebar-header{
+    cursor: pointer;
+}
+
+.side-logo{
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+}
+.login-logo{
+    width: 156px;
+    height: 90px;
+    border-radius: 10px;
+}
+.logo-wrapper{ 
+    justify-content: center;
+}
+.dashboard-count{
+    margin-top: 10px !important;
+}
+.button {
+    padding-top: 30px;
+}
+.btn-color{
+    background-color:#4466f2 ;
+    color: white;
+}
+.boldText {
+    font-weight: 500;
+}
+.img-fluid{
+    height: 20px;
+}
+.right-icon{
+    font-size: 25px;
+}
+hr.class-1 {
+    border-top: 2px solid black;
+}
+.page-wrapper .page-body-wrapper .page-sidebar .sidebar-menu>li>a.active{
+    background-color: #4466f2!important;
+    border-radius: 4px!important;
+    padding: 7px!important;
+}
