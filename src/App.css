@@ -36,3 +36,10 @@
     transform: rotate(360deg);
   }
 }
+.ql-font-Anek-Devanagari {
+  font-family: "Anek Devanagari";
+}
+
+.ql-font-Noto-Sans-Devanagari {
+  font-family: "Noto Sans Devanagari";
+}
