@@ -3,55 +3,61 @@ import Header from "../../component/Header";
 import SideBar from "../../component/SideNav";
 import Footer from "../../component/Footer";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchSubjects, selectAllsubject } from "../../redux/Slices/SubjectSlice";
+import {
+  fetchSubjects,
+  selectAllsubject,
+} from "../../redux/Slices/SubjectSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { addStudyMaterials, getStudyMaterialsStatus, selectedStudyMaterialsWithId } from "../../redux/Slices/StudyMaterialSlice";
+import {
+  addStudyMaterials,
+  getStudyMaterialsStatus,
+  selectedStudyMaterialsWithId,
+} from "../../redux/Slices/StudyMaterialSlice";
 
 const EditNewStudys = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const { id } = useParams();
 
-  const allSubjects = useSelector(selectAllsubject)
-  const status = useSelector(getStudyMaterialsStatus)
-  const study = useSelector((state) => selectedStudyMaterialsWithId(state, id))
-  console.log('study',study);
+  const allSubjects = useSelector(selectAllsubject);
+  const status = useSelector(getStudyMaterialsStatus);
+  const study = useSelector((state) => selectedStudyMaterialsWithId(state, id));
+  console.log("study", study);
+
+  const [studyTopicContent, setStudyTopicContent] = useState([
+    {
+      title: "",
+      description: "",
+    },
+  ]);
   useEffect(() => {
     if (study?.length > 0) {
-
-      setStudyTopicContent(study[0]?.containt)
+      setStudyTopicContent(study[0]?.containt);
     }
-  }, [id])
-
-
-  const [studyTopicContent, setStudyTopicContent] = useState([{
-    title: '',
-    description: ''
-  }])
+  }, [id]);
   const [studyData, setStudyData] = useState({
     subject_id: study[0]?.subject_id,
     title: study[0]?.topic_name,
-    description: studyTopicContent
-  })
+    description: studyTopicContent,
+  });
 
-  console.log('studyTopicContent', studyTopicContent);
+  console.log("studyTopicContent", studyTopicContent);
 
   useEffect(() => {
-    dispatch(fetchSubjects({
-      limit: 200,
-      offset: 0
-    }))
-
-  }, [navigate])
+    dispatch(
+      fetchSubjects({
+        limit: 200,
+        offset: 0,
+      })
+    );
+  }, []);
   useEffect(() => {
-    if (status === 'addSucceeded') {
-      navigatpage('/studys')
+    if (status === "addSucceeded") {
+      navigatpage("/studys");
     }
 
-    return () => {
-
-    }
-  }, [status])
+    return () => {};
+  }, [status]);
 
   const navigatpage = async (navname) => {
     console.log("navigatpage -> navname", navname);
@@ -60,14 +66,17 @@ const EditNewStudys = () => {
 
   const handleValueChange = (event) => {
     const { name, value, type } = event.target;
-    setStudyData(prevState => ({
+    setStudyData((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
-  }
+  };
 
   const addVideoField = () => {
-    setStudyTopicContent([...studyTopicContent, { title: '', description: '' }]);
+    setStudyTopicContent([
+      ...studyTopicContent,
+      { title: "", description: "" },
+    ]);
   };
 
   const removeVideoField = (index) => {
@@ -84,19 +93,18 @@ const EditNewStudys = () => {
     updatedContent[index] = updatedItem;
     setStudyTopicContent(updatedContent);
   };
-  
 
   const editStudyMaterial = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     const data = {
       topic_id: id,
       subject_id: studyData.subject_id,
       topic_name: studyData.title,
-      containt: studyTopicContent
-    }
-    dispatch(addStudyMaterials(data))
-  }
-  console.log('studyData', studyData);
+      containt: studyTopicContent,
+    };
+    dispatch(addStudyMaterials(data));
+  };
+  console.log("studyData", studyData);
 
   return (
     <div className="page-body">
@@ -146,11 +154,13 @@ const EditNewStudys = () => {
                         value={studyData.subject_id}
                         onChange={(e) => handleValueChange(e)}
                       >
-                        <option value={''}>Select Subject</option>
-                        {allSubjects && allSubjects.map((item) => (
-                          <option value={item._id}>{item?.subject_name}</option>
-
-                        ))}
+                        <option value={""}>Select Subject</option>
+                        {allSubjects &&
+                          allSubjects.map((item) => (
+                            <option value={item._id}>
+                              {item?.subject_name}
+                            </option>
+                          ))}
                       </select>
                     </div>
                   </div>
@@ -177,54 +187,89 @@ const EditNewStudys = () => {
                       <div class="form-group">
                         <label htmlFor="videoTitle">Study Topic Content</label>
 
-                        {studyTopicContent && studyTopicContent.map((item, index) => (
-                          <div className="row">
-                            <div className="col-md-8">
-                              <div className="form-group">
-                                <div>
-                                  <input
-                                    className="form-control"
-                                    id="videoTitle"
-                                    type="text"
-                                    placeholder="Title"
-                                    name="title"
-                                    value={item.title}
-                                    onChange={(e) => handleValueChangeContent(index, 'title', e.target.value)}
-                                  />
-                                  <input
-                                    className="form-control"
-                                    id="videoTitle"
-                                    type="text"
-                                    placeholder="Description"
-                                    name="description"
-                                    value={item.description}
-                                    onChange={(e) => handleValueChangeContent(index, 'description', e.target.value)}
-                                  />
+                        {studyTopicContent &&
+                          studyTopicContent.map((item, index) => (
+                            <div className="row">
+                              <div className="col-md-8">
+                                <div className="form-group">
+                                  <div>
+                                    <input
+                                      className="form-control"
+                                      id="videoTitle"
+                                      type="text"
+                                      placeholder="Title"
+                                      name="title"
+                                      value={item.title}
+                                      onChange={(e) =>
+                                        handleValueChangeContent(
+                                          index,
+                                          "title",
+                                          e.target.value
+                                        )
+                                      }
+                                    />
+                                    <input
+                                      className="form-control"
+                                      id="videoTitle"
+                                      type="text"
+                                      placeholder="Description"
+                                      name="description"
+                                      value={item.description}
+                                      onChange={(e) =>
+                                        handleValueChangeContent(
+                                          index,
+                                          "description",
+                                          e.target.value
+                                        )
+                                      }
+                                    />
+                                  </div>
                                 </div>
-
+                              </div>
+                              <div className="col-md-4">
+                                {index === 0 ? (
+                                  <button
+                                    type="button"
+                                    className="btn btn-success"
+                                    onClick={addVideoField}
+                                  >
+                                    +
+                                  </button>
+                                ) : (
+                                  <>
+                                    <button
+                                      type="button"
+                                      className="btn btn-success"
+                                      onClick={addVideoField}
+                                    >
+                                      +
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="btn btn-danger"
+                                      onClick={() => removeVideoField(index)}
+                                    >
+                                      -
+                                    </button>
+                                  </>
+                                )}
                               </div>
                             </div>
-                            <div className="col-md-4">
-                              {index === 0 ? (
-                                <button type="button" className="btn btn-success" onClick={addVideoField}>+</button>
-                              ) : (
-                                <>
-                                  <button type="button" className="btn btn-success" onClick={addVideoField}>+</button>
-                                  <button type="button" className="btn btn-danger" onClick={() => removeVideoField(index)}>-</button>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        ))}
+                          ))}
                       </div>
                     </div>
                   </div>
-
                 </div>
                 <div className="row">
                   <div className="col-md-12 ">
                     <div className="card-footer float-right">
-                      <button className="btn btn-color" type="submit" onClick={(e) => { editStudyMaterial(e) }}>
+                      <button
+                        className="btn btn-color"
+                        type="submit"
+                        onClick={(e) => {
+                          editStudyMaterial(e);
+                        }}
+                      >
                         Update
                       </button>
                     </div>

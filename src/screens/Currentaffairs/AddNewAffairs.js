@@ -1,44 +1,55 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "../../component/Header";
 import SideBar from "../../component/SideNav";
 import Footer from "../../component/Footer";
 import { useNavigate } from "react-router-dom";
-import { fetchSubjects, selectAllsubject } from "../../redux/Slices/SubjectSlice";
+import {
+  fetchSubjects,
+  selectAllsubject,
+} from "../../redux/Slices/SubjectSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { addCureentAffairs, getCurrentAffairsStatus } from "../../redux/Slices/CurrentAffairsSlice";
+import {
+  addCureentAffairs,
+  getCurrentAffairsStatus,
+} from "../../redux/Slices/CurrentAffairsSlice";
+import QuillTextEditor from "screens/Studymaterial/QuillTextEditor";
 
 const AddCurrentAffairs = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
-  const allSubjects = useSelector(selectAllsubject)
-  const status = useSelector(getCurrentAffairsStatus)
+  const dispatch = useDispatch();
+  const editor = useRef(null);
+  const allSubjects = useSelector(selectAllsubject);
+  const status = useSelector(getCurrentAffairsStatus);
+  const [content, setContent] = useState("");
+  console.log("🚀 ~ AddCurrentAffairs ~ content:", content);
 
-  const [affairTopicContent, setAffairTopicContent] = useState([{
-    title: '',
-    description: ''
-  }])
+  const [affairTopicContent, setAffairTopicContent] = useState([
+    {
+      title: "",
+      description: "",
+    },
+  ]);
   const [affairData, setAffairData] = useState({
-    subject_id: '',
-    title: '',
-    description: ''
-  })
+    subject_id: "",
+    title: "",
+    description: "",
+  });
 
   useEffect(() => {
-    dispatch(fetchSubjects({
-      limit: 200,
-      offset: 0
-    }))
-
-  }, [navigate])
+    dispatch(
+      fetchSubjects({
+        limit: 200,
+        offset: 0,
+      })
+    );
+  }, [navigate]);
   useEffect(() => {
-    if (status === 'addSucceeded') {
-      navigatpage('/currentaffairs')
+    if (status === "addSucceeded") {
+      navigatpage("/currentaffairs");
     }
 
-    return () => {
-
-    }
-  }, [status])
+    return () => {};
+  }, [status]);
 
   const navigatpage = async (navname) => {
     console.log("navigatpage -> navname", navname);
@@ -47,14 +58,17 @@ const AddCurrentAffairs = () => {
 
   const handleValueChange = (event) => {
     const { name, value } = event.target;
-    setAffairData(prevState => ({
+    setAffairData((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
-  }
+  };
 
   const addVideoField = () => {
-    setAffairTopicContent([...affairTopicContent, { title: '', description: '' }]);
+    setAffairTopicContent([
+      ...affairTopicContent,
+      { title: "", description: "" },
+    ]);
   };
 
   const removeVideoField = (index) => {
@@ -70,12 +84,14 @@ const AddCurrentAffairs = () => {
   };
 
   const addAffair = (e) => {
-    e.preventDefault()
-    dispatch(addCureentAffairs({
-      title: affairData?.title ?? '',
-      description: affairData?.description ?? ''
-    }))
-  }
+    e.preventDefault();
+    dispatch(
+      addCureentAffairs({
+        title: affairData?.title ?? "",
+        description: content ?? "",
+      })
+    );
+  };
 
   return (
     <div className="page-body">
@@ -99,7 +115,9 @@ const AddCurrentAffairs = () => {
                   >
                     All Current Affairs Listing
                   </li>
-                  <li class="breadcrumb-item active">Add New Current Affairs</li>
+                  <li class="breadcrumb-item active">
+                    Add New Current Affairs
+                  </li>
                 </ol>
               </div>
             </div>
@@ -170,9 +188,9 @@ const AddCurrentAffairs = () => {
                   </div>
                   {/* Description */}
                   <div class="row">
-                    <div class="col-md-8">
-                      <div class="form-group">
-                        <label for="exampleFormControlLastName">
+                    {/* <div class="col-md-8"> */}
+                    {/* <div class="form-group"> */}
+                    {/* <label for="exampleFormControlLastName">
                           Description
                         </label>
                         <input
@@ -183,8 +201,21 @@ const AddCurrentAffairs = () => {
                           name="description"
                           value={affairData.description}
                           onChange={(val) => handleValueChange(val)}
-                        />
-                      </div>
+                        /> */}
+                    {/* </div> */}
+                    {/* </div> */}
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "50%",
+                      }}
+                    >
+                      <QuillTextEditor
+                        ref={editor}
+                        value={content}
+                        setContent={setContent}
+                        style={{ margin: 0 }}
+                      />
                     </div>
                   </div>
                   {/* Multip[le title and description] */}
@@ -236,13 +267,17 @@ const AddCurrentAffairs = () => {
                       </div>
                     </div>
                   </div> */}
-
-
                 </div>
                 <div className="row">
                   <div className="col-md-12 ">
                     <div className="card-footer float-right">
-                      <button className="btn btn-color" type="submit" onClick={(e) => { addAffair(e) }}>
+                      <button
+                        className="btn btn-color"
+                        type="submit"
+                        onClick={(e) => {
+                          addAffair(e);
+                        }}
+                      >
                         Submit
                       </button>
                     </div>

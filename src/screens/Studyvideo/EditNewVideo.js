@@ -1,33 +1,42 @@
 import React, { useEffect, useState } from "react";
-import './SwitchButton.css';
+import "./SwitchButton.css";
 import Header from "../../component/Header";
 import SideBar from "../../component/SideNav";
 import Footer from "../../component/Footer";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchSubjects, selectAllsubject } from "../../redux/Slices/SubjectSlice";
+import {
+  fetchSubjects,
+  selectAllsubject,
+} from "../../redux/Slices/SubjectSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { addVideos, getVideoStatus, selectedVideoWithId } from "../../redux/Slices/VideoSlice";
+import {
+  addVideos,
+  getVideoStatus,
+  selectedVideoWithId,
+} from "../../redux/Slices/VideoSlice";
+import QuillTextEditor from "screens/Studymaterial/QuillTextEditor";
 
 const EditStudyVideo = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
-  const { id } = useParams()
+  const dispatch = useDispatch();
+  const { id } = useParams();
 
-  const allSubjects = useSelector(selectAllsubject)
-  const status = useSelector(getVideoStatus)
-  const SelectedVideo = useSelector(state => selectedVideoWithId(state, id))
-  const [videoContent, setVideoContent] = useState([{
-    tital: '',
-    description: ''
-  }])
+  const allSubjects = useSelector(selectAllsubject);
+  const status = useSelector(getVideoStatus);
+  const SelectedVideo = useSelector((state) => selectedVideoWithId(state, id));
+  const [videoContent, setVideoContent] = useState([
+    {
+      tital: "",
+      description: "",
+    },
+  ]);
   const [videoData, setVideoData] = useState({
-    subject_id: SelectedVideo[0]?.subject_id ?? '',
-    title: SelectedVideo[0]?.title ?? '',
-    video_url: SelectedVideo[0]?.video_url ?? '',
+    subject_id: SelectedVideo[0]?.subject_id ?? "",
+    title: SelectedVideo[0]?.title ?? "",
+    video_url: SelectedVideo[0]?.video_url ?? "",
     description: videoContent,
-    is_trending: SelectedVideo[0]?.is_trending ?? '',
-  })
-
+    is_trending: SelectedVideo[0]?.is_trending ?? "",
+  });
 
   const navigatpage = async (navname) => {
     console.log("navigatpage -> navname", navname);
@@ -36,48 +45,46 @@ const EditStudyVideo = () => {
 
   useEffect(() => {
     if (SelectedVideo?.length > 0) {
-      setVideoContent(SelectedVideo[0]?.description ?? [])
+      setVideoContent(SelectedVideo[0]?.description ?? []);
     }
-  }, [id])
-
+  }, [id]);
 
   useEffect(() => {
-    dispatch(fetchSubjects({
-      limit: 200,
-      offset: 0
-    }))
-
-  }, [navigate])
+    dispatch(
+      fetchSubjects({
+        limit: 200,
+        offset: 0,
+      })
+    );
+  }, [navigate]);
   useEffect(() => {
-    if (status === 'addSucceeded') {
-      navigatpage('/studyvideo')
+    if (status === "addSucceeded") {
+      navigatpage("/studyvideo");
     }
 
-    return () => {
-
-    }
-  }, [status])
+    return () => {};
+  }, [status]);
 
   const handleValueChange = (event) => {
     const { name, value, type } = event.target;
 
-    if (type === 'file') {
+    if (type === "file") {
       const file = event.target.files[0];
 
-      setVideoData(prevState => ({
+      setVideoData((prevState) => ({
         ...prevState,
-        [name]: file
+        [name]: file,
       }));
     } else {
-      setVideoData(prevState => ({
+      setVideoData((prevState) => ({
         ...prevState,
-        [name]: value
+        [name]: value,
       }));
     }
-  }
+  };
 
   const addVideoField = () => {
-    setVideoContent([...videoContent, { title: '', description: '' }]);
+    setVideoContent([...videoContent, { title: "", description: "" }]);
   };
 
   const removeVideoField = (index) => {
@@ -94,10 +101,9 @@ const EditStudyVideo = () => {
     updatedContent[index] = updatedItem;
     setVideoContent(updatedContent);
   };
-  
 
   const editVideo = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     const data = {
       video_id: id,
       subject_id: videoData.subject_id,
@@ -105,18 +111,18 @@ const EditStudyVideo = () => {
       video_url: videoData.video_url,
       description: videoContent,
       is_trending: videoData?.is_trending,
-    }
-    dispatch(addVideos(data))
-  }
-  const [isRight, setIsRight] = useState(false); 
-  
+    };
+    dispatch(addVideos(data));
+  };
+  const [isRight, setIsRight] = useState(false);
+
   const handleClick = () => {
-    setIsRight(prevState => !prevState); 
-    setVideoData(prevState => {
+    setIsRight((prevState) => !prevState);
+    setVideoData((prevState) => {
       const updatedIsTrending = !prevState.is_trending;
       return {
         ...prevState,
-        is_trending: updatedIsTrending
+        is_trending: updatedIsTrending,
       };
     });
   };
@@ -158,23 +164,22 @@ const EditStudyVideo = () => {
               </div>
               <form class="form theme-form">
                 <div class="card-body">
-                <div class="row ">
-                <div class="col-md-8">
-                <span className="cardText">Trending Videos</span>
-                <div class="checkbox-wrapper-6">
-                <input
-                className="tgl tgl-light"
-                id="cb1-6"
-                type="checkbox" 
-                // value={videoData.is_trending}
-                onClick={handleClick}
-                checked={videoData.is_trending}
-              />
-               <label class="tgl-btn" for="cb1-6" />
-               </div>
-              
-                </div>
-              </div>
+                  <div class="row ">
+                    <div class="col-md-8">
+                      <span className="cardText">Trending Videos</span>
+                      <div class="checkbox-wrapper-6">
+                        <input
+                          className="tgl tgl-light"
+                          id="cb1-6"
+                          type="checkbox"
+                          // value={videoData.is_trending}
+                          onClick={handleClick}
+                          checked={videoData.is_trending}
+                        />
+                        <label class="tgl-btn" for="cb1-6" />
+                      </div>
+                    </div>
+                  </div>
                   <div class="row ">
                     <div class="col-md-8">
                       <span className="cardText">Select Subject</span>
@@ -185,11 +190,13 @@ const EditStudyVideo = () => {
                         value={videoData.subject_id}
                         onChange={(e) => handleValueChange(e)}
                       >
-                        <option value={''}>Select Subject</option>
-                        {allSubjects && allSubjects.map((item) => (
-                          <option value={item._id}>{item?.subject_name}</option>
-
-                        ))}
+                        <option value={""}>Select Subject</option>
+                        {allSubjects &&
+                          allSubjects.map((item) => (
+                            <option value={item._id}>
+                              {item?.subject_name}
+                            </option>
+                          ))}
                       </select>
                     </div>
                   </div>
@@ -247,51 +254,111 @@ const EditStudyVideo = () => {
                   {/* Video content */}
                   <label htmlFor="videoTitle">Video Content</label>
 
-                  {videoContent && videoContent.map((item, index) => (
-                    <div className="row">
-                      <div className="col-md-8">
-                        <div className="form-group">
-                          <div>
-                            <input
-                              className="form-control"
-                              id="videoTitle"
-                              type="text"
-                              placeholder="Title"
-                              name="title"
-                              value={item.title}
-                              onChange={(e) => handleValueChangeContent(index, 'title', e.target.value)}
-                            />
-                            <input
-                              className="form-control"
-                              id="videoTitle"
-                              type="text"
-                              placeholder="Description"
-                              name="description"
-                              value={item.description}
-                              onChange={(e) => handleValueChangeContent(index, 'description', e.target.value)}
-                            />
-                          </div>
+                  {videoContent &&
+                    videoContent.map((item, index) => (
+                      <div className="row">
+                        <div className="col-md-8">
+                          <div className="form-group">
+                            <div>
+                              <input
+                                className="form-control"
+                                id="videoTitle"
+                                type="text"
+                                placeholder="Title"
+                                name="title"
+                                value={item.title}
+                                onChange={(e) =>
+                                  handleValueChangeContent(
+                                    index,
+                                    "title",
+                                    e.target.value
+                                  )
+                                }
+                              />
+                              <label
+                                htmlFor="editor"
+                                style={{ marginTop: "1rem" }}
+                              >
+                                Description
+                              </label>
+                              <QuillTextEditor
+                                value={item.description}
+                                style={{
+                                  margin: 0,
 
+                                  padding: 0,
+                                  height: "100%",
+                                }}
+                                // placeholder="Write your description here..."
+                                // ref={editor}
+                                // value={content}
+                                setContent={(content) => {
+                                  handleValueChangeContent(
+                                    index,
+                                    "description",
+                                    content
+                                  );
+                                }}
+                              />
+                              {/* <input
+                                className="form-control"
+                                id="videoTitle"
+                                type="text"
+                                placeholder="Description"
+                                name="description"
+                                value={item.description}
+                                onChange={(e) =>
+                                  handleValueChangeContent(
+                                    index,
+                                    "description",
+                                    e.target.value
+                                  )
+                                }
+                              /> */}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="col-md-4">
+                          {index === 0 ? (
+                            <button
+                              type="button"
+                              className="btn btn-success"
+                              onClick={addVideoField}
+                            >
+                              +
+                            </button>
+                          ) : (
+                            <>
+                              <button
+                                type="button"
+                                className="btn btn-success"
+                                onClick={addVideoField}
+                              >
+                                +
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-danger"
+                                onClick={() => removeVideoField(index)}
+                              >
+                                -
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
-                      <div className="col-md-4">
-                        {index === 0 ? (
-                          <button type="button" className="btn btn-success" onClick={addVideoField}>+</button>
-                        ) : (
-                          <>
-                            <button type="button" className="btn btn-success" onClick={addVideoField}>+</button>
-                            <button type="button" className="btn btn-danger" onClick={() => removeVideoField(index)}>-</button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-
+                    ))}
                 </div>
                 <div className="row">
                   <div className="col-md-12 ">
                     <div className="card-footer float-right">
-                      <button className="btn btn-color" type="submit" onClick={(e) => { editVideo(e) }}>
+                      <button
+                        className="btn btn-color"
+                        type="submit"
+                        onClick={(e) => {
+                          editVideo(e);
+                        }}
+                      >
                         Submit
                       </button>
                     </div>
