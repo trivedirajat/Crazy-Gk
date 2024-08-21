@@ -49,15 +49,11 @@ function DefaultRouters() {
 function AppRoutes() {
   return (
     <div class="page-wrapper">
-
       <Header />
       <div className="page-body-wrapper">
         <SideBar />
         <Routes>
-          <Route
-            path={`${process.env.PUBLIC_URL}/`}
-            element={<Default />}
-          />
+          <Route path={`${process.env.PUBLIC_URL}/`} element={<Default />} />
           {/* <Route path={`${process.env.PUBLIC_URL}/user/*`} element={<User />}>
         <Route path={`edituser`} element={<EditUser />} />
         <Route path={`viewuser`} element={<ViewUser />} />
@@ -77,18 +73,32 @@ function AppRoutes() {
             path={`${process.env.PUBLIC_URL}/addnewuser`}
             element={<AddNewUser />}
           />
-        // Categories
-
-          <Route path={`${process.env.PUBLIC_URL}/subjects/*`} element={<Subjects />} />
-          <Route path={`${process.env.PUBLIC_URL}/studys/*`} element={<Study />} />
-          <Route path={`${process.env.PUBLIC_URL}/studyvideo/*`} element={<StudyVideoList />} />
-          <Route path={`${process.env.PUBLIC_URL}/currentaffairs/*`} element={<CurrentAffairsList />} />
+          {/* // Categories */}
+          <Route
+            path={`${process.env.PUBLIC_URL}/subjects/*`}
+            element={<Subjects />}
+          />
+          <Route
+            path={`${process.env.PUBLIC_URL}/studys/*`}
+            element={<Study />}
+          />
+          <Route
+            path={`${process.env.PUBLIC_URL}/studyvideo/*`}
+            element={<StudyVideoList />}
+          />
+          <Route
+            path={`${process.env.PUBLIC_URL}/currentaffairs/*`}
+            element={<CurrentAffairsList />}
+          />
           <Route path={`${process.env.PUBLIC_URL}/blog/*`} element={<Blog />} />
           <Route
             path={`${process.env.PUBLIC_URL}/addnewstudy`}
             element={<AddStudysMaterial />}
           />
-          <Route path={`${process.env.PUBLIC_URL}/editStudys/:id`} element={<EditNewStudys />} />
+          <Route
+            path={`${process.env.PUBLIC_URL}/editStudys/:id`}
+            element={<EditNewStudys />}
+          />
           <Route
             path={`${process.env.PUBLIC_URL}/addnewstudyvideo`}
             element={<AddStudyVideo />}
@@ -133,10 +143,7 @@ function AppRoutes() {
             path={`${process.env.PUBLIC_URL}/addebook/`}
             element={<AddEBook />}
           />
-          <Route
-            path={`${process.env.PUBLIC_URL}/job/`}
-            element={<Job />}
-          />
+          <Route path={`${process.env.PUBLIC_URL}/job/`} element={<Job />} />
           <Route
             path={`${process.env.PUBLIC_URL}/addjob/`}
             element={<AddNewJob />}
@@ -161,15 +168,14 @@ function AppRoutes() {
         <Footer />
       </div>
     </div>
-  )
+  );
 }
 function Routers() {
   // const [isValidate, setisValidate] = useState(false)
-  const isValidate = useSelector(selectValidate)
-  console.log('isValidate',isValidate);
+  const isValidate = useSelector(selectValidate);
+  console.log("isValidate", isValidate);
   return (
-
-    <div >
+    <div>
       {
         // isValidate ? <AppRoutes /> : <DefaultRouters />
         <AppRoutes />
