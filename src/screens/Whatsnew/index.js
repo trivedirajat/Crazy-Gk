@@ -1,16 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { deleteWhatsNew, fetchWhatsNew, getWhatsNewError, getWhatsNewStatus, selectAllWhatsNew } from "../../redux/Slices/WhatsNewSlice";
+import {
+  deleteWhatsNew,
+  fetchWhatsNew,
+  getWhatsNewError,
+  getWhatsNewStatus,
+  selectAllWhatsNew,
+} from "../../redux/Slices/WhatsNewSlice";
+import { stripHtmlTags } from "utils/stripHtmlTags";
 
 const WhatsNew = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const allWhatsnew = useSelector(selectAllWhatsNew)
-  const status = useSelector(getWhatsNewStatus)
-  const error = useSelector(getWhatsNewError)
-  const [selectedId, setSelectedId] = useState('')
+  const allWhatsnew = useSelector(selectAllWhatsNew);
+  const status = useSelector(getWhatsNewStatus);
+  const error = useSelector(getWhatsNewError);
+  const [selectedId, setSelectedId] = useState("");
   const navigatpage = async (navname) => {
     console.log("navigatpage -> navname", navname);
     navigate(navname);
@@ -18,31 +25,34 @@ const WhatsNew = () => {
   console.log("allWhatsnew -> allWhatsnew", allWhatsnew);
 
   useEffect(() => {
-    dispatch(fetchWhatsNew({
-      limit: 200,
-      offset: 0
-    }))
-
-  }, [navigate])
-  useEffect(() => {
-    if (status === 'deleteSucceeded') {
-      dispatch(fetchWhatsNew({
+    dispatch(
+      fetchWhatsNew({
         limit: 200,
-        offset: 0
-      }))
+        offset: 0,
+      })
+    );
+  }, [navigate]);
+  useEffect(() => {
+    if (status === "deleteSucceeded") {
+      dispatch(
+        fetchWhatsNew({
+          limit: 200,
+          offset: 0,
+        })
+      );
     } else {
-
     }
-
-  }, [status, error])
+  }, [status, error]);
 
   const deleteWhatsNews = (e, selectedId) => {
     console.log("Deleting item with ID:", selectedId);
-    dispatch(deleteWhatsNew({
-      whatsNew_id: selectedId
-    }))
-    setSelectedId('')
-  }
+    dispatch(
+      deleteWhatsNew({
+        whatsNew_id: selectedId,
+      })
+    );
+    setSelectedId("");
+  };
 
   return (
     <div className="page-body">
@@ -79,14 +89,19 @@ const WhatsNew = () => {
               </p>
             </div>
             <div class="modal-footer justify-content-center">
-              <button data-dismiss="modal" onClick={(e) => deleteWhatsNews(e, selectedId)} class="btn btn-success mr-5" type="button">
+              <button
+                data-dismiss="modal"
+                onClick={(e) => deleteWhatsNews(e, selectedId)}
+                class="btn btn-success mr-5"
+                type="button"
+              >
                 Yes
               </button>
               <button
                 class="btn btn-primary"
                 type="button"
                 data-dismiss="modal"
-                onClick={() => setSelectedId('')}
+                onClick={() => setSelectedId("")}
               >
                 No
               </button>
@@ -106,7 +121,10 @@ const WhatsNew = () => {
                   <li class="breadcrumb-item">
                     <a href="index.html">
                       {/* <i data-feather="home"></i> */}
-                      <i class="fa fa-home theme-fa-icon" aria-hidden="true"></i>
+                      <i
+                        class="fa fa-home theme-fa-icon"
+                        aria-hidden="true"
+                      ></i>
                     </a>
                   </li>
                   {/* <li class="breadcrumb-item">Add New User</li>
@@ -128,7 +146,7 @@ const WhatsNew = () => {
                     class="btn btn-color"
                     onClick={() => navigatpage("/addwhatsnew")}
                   >
-                    Add Whats New 
+                    Add Whats New
                   </button>
                 </div>
               </div>
@@ -151,38 +169,43 @@ const WhatsNew = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {allWhatsnew && allWhatsnew.map(item => (
-                          <tr className="text-center">
-
-
-                            <td>{item?.image}</td>
-                            <td>{item?.title}</td>
-                            <td>{item?.description}</td>
-                            <td>
-                           <div style={{display:"flex",flexDirection:"row",justifyContent:"space-between"}}> 
-                              <i
-                                class="fa fa-edit theme-fa-icon mr-3"
-                                aria-hidden="true"
-                                title="Edit Whats New"
-                                onClick={() => {
-                                  navigate(`/addwhatsnew`, { state: { id: item?._id } })
-                                }}
-                              ></i>
-                              <i
-                                class="fa fa-trash theme-fa-icon"
-                                aria-hidden="true"
-                                title="Delete Whats New"
-                                data-toggle="modal"
-                                data-original-title="test"
-                                data-target="#exampleModal"
-                                onClick={() => setSelectedId(item._id)}
-                              ></i>
-                              </div>
+                        {allWhatsnew &&
+                          allWhatsnew.map((item) => (
+                            <tr className="text-center">
+                              <td>{item?.image}</td>
+                              <td>{item?.title}</td>
+                              <td>{stripHtmlTags(item?.description)}</td>
+                              <td>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    justifyContent: "space-between",
+                                  }}
+                                >
+                                  <i
+                                    class="fa fa-edit theme-fa-icon mr-3"
+                                    aria-hidden="true"
+                                    title="Edit Whats New"
+                                    onClick={() => {
+                                      navigate(`/addwhatsnew`, {
+                                        state: { id: item?._id },
+                                      });
+                                    }}
+                                  ></i>
+                                  <i
+                                    class="fa fa-trash theme-fa-icon"
+                                    aria-hidden="true"
+                                    title="Delete Whats New"
+                                    data-toggle="modal"
+                                    data-original-title="test"
+                                    data-target="#exampleModal"
+                                    onClick={() => setSelectedId(item._id)}
+                                  ></i>
+                                </div>
                               </td>
-                          </tr>
-                        ))}
-
-
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>
