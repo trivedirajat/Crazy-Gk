@@ -5,71 +5,74 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 // import { addWhatsNew,getWhatsNewStatus, selectedWhatsNewWithId } from "redux/Slices/WhatsNewSlice";
-import { addWhatsNew, getWhatsNewStatus, selectedWhatsNewWithId } from "../../redux/Slices/WhatsNewSlice";
+import {
+  addWhatsNew,
+  getWhatsNewStatus,
+  selectedWhatsNewWithId,
+} from "../../redux/Slices/WhatsNewSlice";
 import { BASE_URL } from "utils/Global";
-
+import QuillTextEditor from "screens/Studymaterial/QuillTextEditor";
 
 const AddWhatsNew = () => {
   const navigate = useNavigate();
-  const location = useLocation()
-  const { id } = location.state || {}
-  const dispatch = useDispatch()
-  const status = useSelector(getWhatsNewStatus)
-  const selectedWhatsNew = useSelector(state => selectedWhatsNewWithId(state, id !== undefined ? id : 0))
+  const location = useLocation();
+  const { id } = location.state || {};
+  const dispatch = useDispatch();
+  const status = useSelector(getWhatsNewStatus);
+  const selectedWhatsNew = useSelector((state) =>
+    selectedWhatsNewWithId(state, id !== undefined ? id : 0)
+  );
 
   const [whatsNewData, setWhatsNewData] = useState({
-    image: '',
-    title: '',
-    description: ''
-  })
-  const [imagePreview, setImagePreview] = useState('');
-  console.log("eBookDataimagePreview",imagePreview);
+    image: "",
+    title: "",
+    description: "",
+  });
+  const [imagePreview, setImagePreview] = useState("");
+  const [content, setContent] = useState("");
+  console.log("eBookDataimagePreview", imagePreview);
   const navigatpage = async (navname) => {
     console.log("navigatpage -> navname", navname);
     navigate(navname);
   };
 
   useEffect(() => {
-    if (status === 'addSucceeded') {
-      navigatpage('/WhatsNew')
+    if (status === "addSucceeded") {
+      navigatpage("/WhatsNew");
     }
 
-    return () => {
-
-    }
-  }, [status])
+    return () => {};
+  }, [status]);
 
   useEffect(() => {
     if (id !== undefined) {
       setWhatsNewData({
-              image: selectedWhatsNew[0]?.image ?? '',
-              title: selectedWhatsNew[0]?.title ?? '',
-              description: selectedWhatsNew[0]?.description ?? ''
-            })
-      
+        image: selectedWhatsNew[0]?.image ?? "",
+        title: selectedWhatsNew[0]?.title ?? "",
+        description: selectedWhatsNew[0]?.description ?? "",
+      });
+      setContent(selectedWhatsNew[0]?.description ?? "");
       // Display image preview if image exists
       if (selectedWhatsNew[0]?.image) {
         setImagePreview(selectedWhatsNew[0].image);
       }
     }
 
-    return () => {
-
-    }
-  }, [id])
+    return () => {};
+  }, [id]);
 
   const handleValueChange = (event) => {
     const { name, value, type } = event.target;
-  
-    if (type === 'file') {
+
+    if (type === "file") {
       const file = event.target.files[0];
-      setWhatsNewData(prevState => ({
+      setWhatsNewData((prevState) => ({
         ...prevState,
-        [name]: file
+        [name]: file,
       }));
-      
-      const fileName = file.name.replace(/^.*[\\\/]/, ''); // This will also give you 'download.jpg'
-  
+
+      const fileName = file.name.replace(/^.*[\\\/]/, ""); // This will also give you 'download.jpg'
+
       // Display image preview
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -78,22 +81,22 @@ const AddWhatsNew = () => {
       if (file) {
         reader.readAsDataURL(file);
       } else {
-        setImagePreview('');
+        setImagePreview("");
       }
     } else {
-      setWhatsNewData(prevState => ({
+      setWhatsNewData((prevState) => ({
         ...prevState,
-        [name]: value
+        [name]: value,
       }));
     }
-  }
+  };
   const removeImage = () => {
-    setWhatsNewData(prevState => ({
+    setWhatsNewData((prevState) => ({
       ...prevState,
-      image: '',
+      image: "",
     }));
-    setImagePreview('');
-  }
+    setImagePreview("");
+  };
   // useEffect(() => {
   //   if (id !== undefined) {
   //     setWhatsNewData({
@@ -107,9 +110,6 @@ const AddWhatsNew = () => {
 
   //   }
   // }, [id])
-
-
-
 
   // const handleValueChange = (event) => {
   //   const { name, value, type } = event.target;
@@ -128,20 +128,18 @@ const AddWhatsNew = () => {
   //     }));
   //   }
   // }
-  
-
 
   const addwhatsnew = (e) => {
-    e.preventDefault()
-    const formData = new FormData()
+    e.preventDefault();
+    const formData = new FormData();
     if (id !== undefined) {
-      formData.append('whatsNew_id', id)
+      formData.append("whatsNew_id", id);
     }
-    formData.append('image', whatsNewData.image)
-    formData.append('title', whatsNewData.title)
-    formData.append('description', whatsNewData.description)
-    dispatch(addWhatsNew(formData))
-  }
+    formData.append("image", whatsNewData.image);
+    formData.append("title", whatsNewData.title);
+    formData.append("description", content);
+    dispatch(addWhatsNew(formData));
+  };
 
   return (
     <div className="page-body">
@@ -181,7 +179,7 @@ const AddWhatsNew = () => {
               </div>
               <form class="form theme-form">
                 <div class="card-body">
-                <div className="row ">
+                  <div className="row ">
                     <div className="col-md-8 ">
                       <div className="form-group">
                         <label htmlFor="exampleFormControlFirstName">
@@ -229,7 +227,16 @@ const AddWhatsNew = () => {
                         <label for="exampleFormControlLastName">
                           Description
                         </label>
-                        <input
+                        <QuillTextEditor
+                          value={content}
+                          style={{
+                            margin: 0,
+                            padding: 0,
+                            height: "100%",
+                          }}
+                          setContent={setContent}
+                        />
+                        {/* <input
                           class="form-control"
                           id="exampleFormControlLastName"
                           type="text"
@@ -237,16 +244,21 @@ const AddWhatsNew = () => {
                           name="description"
                           value={whatsNewData?.description}
                           onChange={(e) => handleValueChange(e)}
-                        />
+                        /> */}
                       </div>
                     </div>
                   </div>
-
                 </div>
                 <div className="row">
                   <div className="col-md-12 ">
                     <div className="card-footer float-right">
-                      <button className="btn btn-color" type="submit" onClick={(e) => { addwhatsnew(e) }}>
+                      <button
+                        className="btn btn-color"
+                        type="submit"
+                        onClick={(e) => {
+                          addwhatsnew(e);
+                        }}
+                      >
                         Submit
                       </button>
                     </div>
