@@ -36,3 +36,19 @@
     transform: rotate(360deg);
   }
 }
+.ql-font-Anek-Devanagari {
+  font-family: "Anek Devanagari";
+}
+
+.ql-font-Noto-Sans-Devanagari {
+  font-family: "Noto Sans Devanagari";
+}
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-label[data-value="Anek-Devanagari"]::before,
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-item[data-value="Anek-Devanagari"]::before {
+  content: "Devanagari" !important;
+  font-family: "Anek Devanagari" !important;
+}
