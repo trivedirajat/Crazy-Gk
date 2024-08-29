@@ -211,7 +211,7 @@ const Study = () => {
 
                           <td>{item?.subject_name}</td>
                           <td>{item?.topic_name}</td>
-                          <td>0987654321</td>
+                          <td>{item?.containt}</td>
                           <td>Free</td>
                           <td>
                             <i

@@ -57,14 +57,13 @@ const modules = {
     [{ color: [] }, { background: [] }],
     [{ align: [] }],
     ["clean"],
-    
   ],
   imageActions: {},
   imageFormats: {},
   imageDrop: true,
 };
 
-export default function QuillTextEditor({ value, setContent, ref }) {
+export default function QuillTextEditor({ value, setContent, ref, style }) {
   //   const [value, setValue] = useState('');
   //   const [socket, setSocket] = useState(null);
 
@@ -91,7 +90,7 @@ export default function QuillTextEditor({ value, setContent, ref }) {
   return (
     <ReactQuill
       ref={ref}
-      style={{ height: "500px", width: "100%" }} // Uncomment and check styling once
+      style={{ height: "500px", width: "100%", ...style }} // Uncomment and check styling once
       className="container"
       theme="snow"
       value={value}
