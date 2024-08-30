@@ -1,66 +1,121 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { deleteBlogs, fetchBlogs, getBlogsError, getBlogsStatus, selectAllBlogs } from "../../redux/Slices/BlogSlice";
+import {
+  deleteBlogs,
+  fetchBlogs,
+  getBlogsError,
+  getBlogsStatus,
+  selectAllBlogs,
+} from "../../redux/Slices/BlogSlice";
+import { DataGrid } from "@mui/x-data-grid";
+import { stripHtmlTags } from "../../utils/stripHtmlTags";
 
 const Blog = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const allBlogs = useSelector(selectAllBlogs)
-  const status = useSelector(getBlogsStatus)
-  const error = useSelector(getBlogsError)
-  const [selectedId, setSelectedId] = useState('')
+  const allBlogs = useSelector(selectAllBlogs);
+  const status = useSelector(getBlogsStatus);
+  const error = useSelector(getBlogsError);
+  const [selectedId, setSelectedId] = useState("");
+
   const navigatpage = async (navname) => {
-    console.log("navigatpage -> navname", navname);
     navigate(navname);
   };
 
   useEffect(() => {
-    dispatch(fetchBlogs({
-      limit: 200,
-      offset: 0
-    }))
-
-  }, [navigate])
-  useEffect(() => {
-    if (status === 'deleteSucceeded') {
-      dispatch(fetchBlogs({
+    dispatch(
+      fetchBlogs({
         limit: 200,
-        offset: 0
-      }))
-    } else {
+        offset: 0,
+      })
+    );
+  }, [navigate]);
 
+  useEffect(() => {
+    if (status === "deleteSucceeded") {
+      dispatch(
+        fetchBlogs({
+          limit: 200,
+          offset: 0,
+        })
+      );
     }
-
-  }, [status, error])
+  }, [status, error]);
 
   const deleteBlog = (e, id) => {
-    dispatch(deleteBlogs({
-      blog_id: id
-    }))
-    setSelectedId('')
-  }
+    dispatch(
+      deleteBlogs({
+        blog_id: id,
+      })
+    );
+    setSelectedId("");
+  };
+
+  // Columns configuration for DataGrid
+  const columns = [
+    { field: "title", headerName: "Title", flex: 0.33 },
+    {
+      field: "description",
+      headerName: "Description",
+      flex: 0.88,
+      renderCell: (params) => stripHtmlTags(params.value),
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 0.11,
+      renderCell: (params) => (
+        <>
+          <i
+            className="fa fa-edit theme-fa-icon mr-3"
+            aria-hidden="true"
+            title="Edit Blog"
+            onClick={() =>
+              navigate(`/addEditblogs`, { state: { id: params.row._id } })
+            }
+          ></i>
+          <i
+            className="fa fa-trash theme-fa-icon"
+            aria-hidden="true"
+            title="Delete Blog"
+            data-toggle="modal"
+            data-target="#exampleModal"
+            onClick={() => setSelectedId(params.row._id)}
+          ></i>
+        </>
+      ),
+    },
+  ];
+
+  // Rows data for DataGrid
+  const rows = allBlogs.map((blog) => ({
+    id: blog._id,
+    title: blog.title,
+    description: blog.description,
+    _id: blog._id,
+  }));
 
   return (
     <div className="page-body">
-      {/* Model_start */}
+      {/* Modal_start */}
       <div
-        class="modal fade"
+        className="modal fade"
         id="exampleModal"
         tabIndex="-1"
         role="dialog"
         aria-labelledby="exampleModalLabel"
         aria-hidden="true"
       >
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title" id="exampleModalLabel">
                 Remove Blog
               </h5>
               <button
-                class="close"
+                className="close"
                 type="button"
                 data-dismiss="modal"
                 aria-label="Close"
@@ -68,23 +123,28 @@ const Blog = () => {
                 <span aria-hidden="true">×</span>
               </button>
             </div>
-            <div class="modal-body">
+            <div className="modal-body">
               <p className="text-center">
-                <h6>Are You Sure ?</h6>
+                <h6>Are You Sure?</h6>
               </p>
               <p className="text-center">
                 <h6>Remove This Blog</h6>
               </p>
             </div>
-            <div class="modal-footer justify-content-center">
-              <button class="btn btn-success mr-5" type="button" data-dismiss="modal" onClick={(e) => deleteBlog(e, selectedId)}>
+            <div className="modal-footer justify-content-center">
+              <button
+                className="btn btn-success mr-5"
+                type="button"
+                data-dismiss="modal"
+                onClick={(e) => deleteBlog(e, selectedId)}
+              >
                 Yes
               </button>
               <button
-                class="btn btn-primary"
+                className="btn btn-primary"
                 type="button"
                 data-dismiss="modal"
-                onClick={() => setSelectedId('')}
+                onClick={() => setSelectedId("")}
               >
                 No
               </button>
@@ -92,38 +152,39 @@ const Blog = () => {
           </div>
         </div>
       </div>
-      {/* Model_end */}
+      {/* Modal_end */}
 
-      <div class="container-fluid">
-        <div class="page-header">
-          <div class="row">
-            <div class="col">
-              <div class="page-header-left">
+      <div className="container-fluid">
+        <div className="page-header">
+          <div className="row">
+            <div className="col">
+              <div className="page-header-left">
                 <h3>All Blog</h3>
-                <ol class="breadcrumb">
-                  <li class="breadcrumb-item">
+                <ol className="breadcrumb">
+                  <li className="breadcrumb-item">
                     <a href="index.html">
-                      {/* <i data-feather="home"></i> */}
-                      <i class="fa fa-home theme-fa-icon" aria-hidden="true"></i>
+                      <i
+                        className="fa fa-home theme-fa-icon"
+                        aria-hidden="true"
+                      ></i>
                     </a>
                   </li>
-                  {/* <li class="breadcrumb-item">Add New User</li>
-                                            <li class="breadcrumb-item">Form Layout</li> */}
-                  <li class="breadcrumb-item active">All Blog Listing</li>
+                  <li className="breadcrumb-item active">All Blog Listing</li>
                 </ol>
               </div>
             </div>
           </div>
         </div>
       </div>
+
       <div className="container-fluid">
-        <div class="row">
-          <div class="col-sm-12 col-xl-12">
+        <div className="row">
+          <div className="col-sm-12 col-xl-12">
             <div className="row pt-3">
               <div className="col-md-6">
-                <div class="form-group">
+                <div className="form-group">
                   <button
-                    class="btn btn-color"
+                    className="btn btn-color"
                     onClick={() => navigatpage("/addEditblogs")}
                   >
                     Add New Blog
@@ -131,84 +192,21 @@ const Blog = () => {
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col-sm-12 col-xl-12">
-                <div class="card">
-                  <div class="card-header">
-                    <h5>List of Blog:</h5>
+
+            <div className="row">
+              <div className="col-sm-12 col-xl-12">
+                <div className="card">
+                  <div className="card-header">
+                    <h5>List of Blogs:</h5>
                   </div>
-                  <div class="table-responsive">
-                    <table class="table table-border-horizontal">
-                      <thead>
-                        <tr className="text-center">
-                          <th scope="col">Title</th>
-                          <th scope="col">Description</th>
-                          <th scope="col">Action</th>
-                          <th scope="col"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {allBlogs && allBlogs.map(item => (
-                          <tr className="text-center">
-
-
-                            <td>{item?.title}</td>
-                            <td>{item?.description}</td>
-                            <td>
-                              <i
-                                class="fa fa-edit theme-fa-icon mr-3"
-                                aria-hidden="true"
-                                title="Edit Blog"
-                                onClick={() => {
-                                  navigate(`/addEditblogs`, { state: { id: item?._id } })
-                                }}
-                              ></i>
-                              <i
-                                class="fa fa-trash theme-fa-icon"
-                                aria-hidden="true"
-                                title="Delete Blog"
-                                data-toggle="modal"
-                                data-original-title="test"
-                                data-target="#exampleModal"
-                                onClick={() => setSelectedId(item._id)}
-                              ></i>
-                            </td>
-
-                          </tr>
-                        ))}
-
-
-                      </tbody>
-                    </table>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div class="col-12  ">
-                      <div class="card ">
-                        <div class="card-body ">
-                          <nav aria-label="Page navigation example ">
-                            <ul class="pagination pagination-primary float-right">
-                              <li class="page-item">
-                                <a class="page-link">Previous</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">1</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">2</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">3</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">Next</a>
-                              </li>
-                            </ul>
-                          </nav>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                  <DataGrid
+                    rows={rows}
+                    columns={columns}
+                    pageSize={10}
+                    rowsPerPageOptions={[5, 10, 20]}
+                    checkboxSelection={false}
+                    rowSelection={false}
+                  />
                 </div>
               </div>
             </div>
@@ -218,4 +216,5 @@ const Blog = () => {
     </div>
   );
 };
+
 export default Blog;
