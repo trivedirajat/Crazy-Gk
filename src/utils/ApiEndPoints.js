@@ -40,5 +40,16 @@ export const apiEndPoints = {
   // Rwview
   fetchReview: "/review/getReview",
   addReview: "/review/addReview",
+  // Question
   deleteReview: "/review/reviewDelete",
+  addQuestion: "/question/addQuestion",
+  getQustions: "/question/",
+  editQuestion: "/question/editQuestion",
+  deleteQuestion: "/question/deleteQuestion",
+  getgetQuestionsListbySubjectid: "/question/getQuestionsListbySubjectid",
+  // Quiz
+  getQuiz: "/quiz/getQuizs",
+  addQuiz: "/quiz/addQuiz",
+  editQuiz: "/quiz/updateQuiz",
+  deleteQuiz: "/quiz/deleteQuiz",
 };
