@@ -3,28 +3,43 @@ import Header from "../../component/Header";
 import SideBar from "../../component/SideNav";
 import Footer from "../../component/Footer";
 import { useNavigate } from "react-router-dom";
-import { fetchSubjects, selectAllsubject } from "../../redux/Slices/SubjectSlice";
+import {
+  fetchSubjects,
+  selectAllsubject,
+} from "../../redux/Slices/SubjectSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { addStudyMaterials, getStudyMaterialsStatus } from "../../redux/Slices/StudyMaterialSlice";
-// import { CKEditor } from '@ckeditor/ckeditor5-react';
-// import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import JoditEditor from 'jodit-react';
-import '../../App.css'
+import {
+  addStudyMaterials,
+  getStudyMaterialsStatus,
+} from "../../redux/Slices/StudyMaterialSlice";
+
+import "../../App.css";
 import QuillTextEditor from "./QuillTextEditor";
 
 const AddStudysMaterial = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
-  const allSubjects = useSelector(selectAllsubject)
-  const status = useSelector(getStudyMaterialsStatus)
+  const dispatch = useDispatch();
+  const allSubjects = useSelector(selectAllsubject);
+  const status = useSelector(getStudyMaterialsStatus);
   const editor = useRef(null);
-  const [content, setContent] = useState('');
-  const config = useMemo(() => ({
-    height: '500px',
-    width: '100%',
-    toolbarSticky: true,
-    removeButtons: ['brush', 'superscript', 'subscript', 'Insert className', 'aboutjodit', 'print', 'speechRecognize']
-  }), []);
+  const [content, setContent] = useState("");
+  const config = useMemo(
+    () => ({
+      height: "500px",
+      width: "100%",
+      toolbarSticky: true,
+      removeButtons: [
+        "brush",
+        "superscript",
+        "subscript",
+        "Insert className",
+        "aboutjodit",
+        "print",
+        "speechRecognize",
+      ],
+    }),
+    []
+  );
   // const config = useMemo(
   //   {
   //     height: '500px',
@@ -33,33 +48,33 @@ const AddStudysMaterial = () => {
   //   },
   //   [editor]
   // );
-  const [studyTopicContent, setStudyTopicContent] = useState([{
-    title: '',
-    description: ''
-  }])
+  const [studyTopicContent, setStudyTopicContent] = useState([
+    {
+      title: "",
+      description: "",
+    },
+  ]);
   const [studyData, setStudyData] = useState({
-    subject_id: '',
-    title: '',
-    description: studyTopicContent
-  })
-
+    subject_id: "",
+    title: "",
+    description: studyTopicContent,
+  });
 
   useEffect(() => {
-    dispatch(fetchSubjects({
-      limit: 200,
-      offset: 0
-    }))
-
-  }, [navigate])
+    dispatch(
+      fetchSubjects({
+        limit: 200,
+        offset: 0,
+      })
+    );
+  }, [navigate]);
   useEffect(() => {
-    if (status === 'addSucceeded') {
-      navigatpage('/studys')
+    if (status === "addSucceeded") {
+      navigatpage("/studys");
     }
 
-    return () => {
-
-    }
-  }, [status])
+    return () => {};
+  }, [status]);
 
   const navigatpage = async (navname) => {
     console.log("navigatpage -> navname", navname);
@@ -68,14 +83,17 @@ const AddStudysMaterial = () => {
 
   const handleValueChange = (event) => {
     const { name, value, type } = event.target;
-    setStudyData(prevState => ({
+    setStudyData((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
-  }
+  };
 
   const addVideoField = () => {
-    setStudyTopicContent([...studyTopicContent, { title: '', description: '' }]);
+    setStudyTopicContent([
+      ...studyTopicContent,
+      { title: "", description: "" },
+    ]);
   };
 
   const removeVideoField = (index) => {
@@ -91,17 +109,15 @@ const AddStudysMaterial = () => {
   };
 
   const addStudyMaterial = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     const data = {
       subject_id: studyData.subject_id,
       topic_name: studyData.title,
-      containt: content
-    }
-    dispatch(addStudyMaterials(data))
-  }
-  console.log('studyData', studyData);
-
-
+      containt: content,
+    };
+    dispatch(addStudyMaterials(data));
+  };
+  console.log("studyData", studyData);
 
   return (
     <div className="page-body">
@@ -151,15 +167,17 @@ const AddStudysMaterial = () => {
                         value={studyData.subject_id}
                         onChange={(e) => handleValueChange(e)}
                       >
-                        <option value={''}>Select Subject</option>
-                        {allSubjects && allSubjects.map((item) => (
-                          <option value={item._id}>{item?.subject_name}</option>
-
-                        ))}
+                        <option value={""}>Select Subject</option>
+                        {allSubjects &&
+                          allSubjects.map((item) => (
+                            <option value={item._id}>
+                              {item?.subject_name}
+                            </option>
+                          ))}
                       </select>
                     </div>
                   </div>
-                  <br/>
+                  <br />
                   <div class="row">
                     <div class="col-md-8">
                       <div class="form-group">
@@ -225,9 +243,11 @@ const AddStudysMaterial = () => {
                       </div>
                     </div>
                   </div> */}
-                  <div className="row" style={{ width: '100%', height: '100%' }}>
-                    <div style={{ width: '100%', height: '50%' }}>
-
+                  <div
+                    className="row"
+                    style={{ width: "100%", height: "100%" }}
+                  >
+                    <div style={{ width: "100%", height: "50%" }}>
                       {/* Old editor */}
                       {/* <JoditEditor
                         ref={editor}
@@ -239,7 +259,11 @@ const AddStudysMaterial = () => {
                       /> */}
 
                       {/* New Editor */}
-                      <QuillTextEditor ref={editor} value={content} setContent={newContent => setContent(newContent)} />
+                      <QuillTextEditor
+                        ref={editor}
+                        value={content}
+                        setContent={(newContent) => setContent(newContent)}
+                      />
 
                       {/* {content} */}
                     </div>
@@ -248,7 +272,13 @@ const AddStudysMaterial = () => {
                 <div className="row">
                   <div className="col-md-12 ">
                     <div className="card-footer float-right">
-                      <button className="btn btn-color" type="submit" onClick={(e) => { addStudyMaterial(e) }}>
+                      <button
+                        className="btn btn-color"
+                        type="submit"
+                        onClick={(e) => {
+                          addStudyMaterial(e);
+                        }}
+                      >
                         Submit
                       </button>
                     </div>

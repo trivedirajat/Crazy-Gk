@@ -1,7 +1,4 @@
-import React, { useEffect, useState } from "react";
-import Header from "../../component/Header";
-import SideBar from "../../component/SideNav";
-import Footer from "../../component/Footer";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   fetchSubjects,
@@ -14,35 +11,44 @@ import {
   selectedStudyMaterialsWithId,
 } from "../../redux/Slices/StudyMaterialSlice";
 
-const EditNewStudys = () => {
+import "../../App.css";
+import QuillTextEditor from "./QuillTextEditor";
+import {
+  useEditStudyMutation,
+  useGetStudymaterialQuery,
+} from "../../redux/apis/studyapis";
+
+const AddStudysMaterial = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { id } = useParams();
-
-  const allSubjects = useSelector(selectAllsubject);
-  const status = useSelector(getStudyMaterialsStatus);
-  const study = useSelector((state) => selectedStudyMaterialsWithId(state, id));
-  console.log("study", study);
-
-  const [studyTopicContent, setStudyTopicContent] = useState([
+  const dispatch = useDispatch();
+  const { data, isLoading } = useGetStudymaterialQuery(
+    { id },
     {
+      skip: !id,
+    }
+  );
+  const [editStudy] = useEditStudyMutation();
+  const allSubjects = useSelector(selectAllsubject);
+  const editor = useRef(null);
+  const [content, setContent] = useState("");
+
+  const [studyData, setStudyData] = useState({
+    subject_id: "",
+    title: "",
+    description: {
       title: "",
       description: "",
     },
-  ]);
-  useEffect(() => {
-    if (study?.length > 0) {
-      setStudyTopicContent(study[0]?.containt);
-    }
-  }, [id]);
-  const [studyData, setStudyData] = useState({
-    subject_id: study[0]?.subject_id,
-    title: study[0]?.topic_name,
-    description: studyTopicContent,
   });
 
-  console.log("studyTopicContent", studyTopicContent);
-
+  const handleValueChange = (event) => {
+    const { name, value } = event.target;
+    setStudyData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
   useEffect(() => {
     dispatch(
       fetchSubjects({
@@ -52,59 +58,39 @@ const EditNewStudys = () => {
     );
   }, []);
   useEffect(() => {
-    if (status === "addSucceeded") {
-      navigatpage("/studys");
+    if (data) {
+      const { subject_id, topic_name, containt } = data?.data;
+      setStudyData({
+        subject_id,
+        title: topic_name,
+        description: {
+          title: topic_name,
+          description: containt,
+        },
+      });
+      setContent(data?.data?.containt);
     }
-
-    return () => {};
-  }, [status]);
-
-  const navigatpage = async (navname) => {
-    console.log("navigatpage -> navname", navname);
-    navigate(navname);
-  };
-
-  const handleValueChange = (event) => {
-    const { name, value, type } = event.target;
-    setStudyData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  const addVideoField = () => {
-    setStudyTopicContent([
-      ...studyTopicContent,
-      { title: "", description: "" },
-    ]);
-  };
-
-  const removeVideoField = (index) => {
-    const updatedContent = [...studyTopicContent];
-    updatedContent.splice(index, 1);
-    setStudyTopicContent(updatedContent);
-  };
-
-  const handleValueChangeContent = (index, field, value) => {
-    const updatedContent = [...studyTopicContent];
-    // Create a new object with the updated value
-    const updatedItem = { ...updatedContent[index], [field]: value };
-    // Replace the old object with the new one in the array
-    updatedContent[index] = updatedItem;
-    setStudyTopicContent(updatedContent);
-  };
-
-  const editStudyMaterial = (e) => {
+  }, [data]);
+  const editStudyMaterial = async (e) => {
     e.preventDefault();
     const data = {
-      topic_id: id,
+      id,
       subject_id: studyData.subject_id,
       topic_name: studyData.title,
-      containt: studyTopicContent,
+      containt: content,
     };
-    dispatch(addStudyMaterials(data));
+
+    const { data: response } = await editStudy(data);
+    if (response) {
+      const { status } = response;
+      if (status === 200) {
+        navigate("/studys");
+      }
+    }
   };
-  console.log("studyData", studyData);
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="page-body">
@@ -113,7 +99,7 @@ const EditNewStudys = () => {
           <div class="row">
             <div class="col">
               <div class="page-header-left">
-                <h3>Edit Study Material</h3>
+                <h3>Add New Study Material</h3>
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item">
                     <a href="index.html">
@@ -122,13 +108,11 @@ const EditNewStudys = () => {
                   </li>
                   <li
                     class="breadcrumb-item"
-                    onClick={() => {
-                      navigatpage("/studys");
-                    }}
+                    onClick={() => navigate("/studys")}
                   >
                     All Study Material Listing
                   </li>
-                  <li class="breadcrumb-item active">Edit Study Material</li>
+                  <li class="breadcrumb-item active">edit Study Material</li>
                 </ol>
               </div>
             </div>
@@ -140,7 +124,7 @@ const EditNewStudys = () => {
           <div class="col-sm-12 ">
             <div class="card">
               <div class="card-header">
-                <h5>Edit Study Material</h5>
+                <h5>Add New Study Material</h5>
               </div>
               <form class="form theme-form">
                 <div class="card-body">
@@ -164,6 +148,7 @@ const EditNewStudys = () => {
                       </select>
                     </div>
                   </div>
+                  <br />
                   <div class="row">
                     <div class="col-md-8">
                       <div class="form-group">
@@ -182,7 +167,7 @@ const EditNewStudys = () => {
                       </div>
                     </div>
                   </div>
-                  <div class="row">
+                  {/* <div class="row">
                     <div class="col-md-8">
                       <div class="form-group">
                         <label htmlFor="videoTitle">Study Topic Content</label>
@@ -258,6 +243,31 @@ const EditNewStudys = () => {
                           ))}
                       </div>
                     </div>
+                  </div> */}
+                  <div
+                    className="row"
+                    style={{ width: "100%", height: "100%" }}
+                  >
+                    <div style={{ width: "100%", height: "50%" }}>
+                      {/* Old editor */}
+                      {/* <JoditEditor
+                        ref={editor}
+                        value={content}
+                        config={config}
+                        tabIndex={1} // tabIndex of textarea
+                        onBlur={newContent => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
+                        onChange={newContent => setContent(newContent)}
+                      /> */}
+
+                      {/* New Editor */}
+                      <QuillTextEditor
+                        ref={editor}
+                        value={content}
+                        setContent={(newContent) => setContent(newContent)}
+                      />
+
+                      {/* {content} */}
+                    </div>
                   </div>
                 </div>
                 <div className="row">
@@ -283,4 +293,4 @@ const EditNewStudys = () => {
     </div>
   );
 };
-export default EditNewStudys;
+export default AddStudysMaterial;
