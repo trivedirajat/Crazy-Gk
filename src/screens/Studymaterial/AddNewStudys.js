@@ -1,7 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import Header from "../../component/Header";
-import SideBar from "../../component/SideNav";
-import Footer from "../../component/Footer";
 import { useNavigate } from "react-router-dom";
 import {
   fetchSubjects,
@@ -23,23 +20,7 @@ const AddStudysMaterial = () => {
   const status = useSelector(getStudyMaterialsStatus);
   const editor = useRef(null);
   const [content, setContent] = useState("");
-  const config = useMemo(
-    () => ({
-      height: "500px",
-      width: "100%",
-      toolbarSticky: true,
-      removeButtons: [
-        "brush",
-        "superscript",
-        "subscript",
-        "Insert className",
-        "aboutjodit",
-        "print",
-        "speechRecognize",
-      ],
-    }),
-    []
-  );
+
   // const config = useMemo(
   //   {
   //     height: '500px',

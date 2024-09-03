@@ -24,7 +24,7 @@ import {
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 
-const QuizForm = ({ initialData = {}, Isedit = false }) => {
+const QuizForm = ({  Isedit = false }) => {
   const { Quizid } = useParams();
   const [editQuiz] = useEditQuizMutation();
   const { data: Quize = [] } = useGetQuizQuery(
@@ -47,14 +47,14 @@ const QuizForm = ({ initialData = {}, Isedit = false }) => {
     setValue,
   } = useForm({
     defaultValues: {
-      name: initialData.name || "",
-      description: initialData.description || "",
-      questionList: initialData.questionList || [],
-      subject: initialData.subject || "",
-      totalMarks: initialData.totalMarks || "",
-      passingMarks: initialData.passingMarks || "",
-      negativeMarks: initialData.negativeMarks || "",
-      isPublished: initialData.isPublished || true,
+      name: "",
+      description: "",
+      questionList: [],
+      subject: "",
+      totalMarks: "",
+      passingMarks: "",
+      negativeMarks: "",
+      isPublished: true,
     },
   });
 

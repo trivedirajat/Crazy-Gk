@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Header from "../../component/Header";
-import SideBar from "../../component/SideNav";
-import Footer from "../../component/Footer";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addBlogs,
@@ -43,6 +40,7 @@ const AddBlogs = () => {
 
   useEffect(() => {
     if (id !== undefined) {
+      setContent(selectedBlog[0]?.description);
       setBlogData({
         image: selectedBlog[0]?.image ?? "",
         title: selectedBlog[0]?.title ?? "",

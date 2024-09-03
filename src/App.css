@@ -39,6 +39,30 @@
 .ql-font-Anek-Devanagari {
   font-family: "Anek Devanagari";
 }
+.ql-font-Roboto {
+  font-family: "Roboto";
+}
+.ql-font-Raleway {
+  font-family: "Raleway";
+}
+.ql-font-Montserrat {
+  font-family: "Montserrat";
+}
+.ql-font-Lato {
+  font-family: "Lato";
+}
+.ql-font-Hind {
+  font-family: "Hind";
+}
+.ql-font-Cairo {
+  font-family: "Cairo";
+}
+.ql-font-Kalnia-Glaze {
+  font-family: "Kalnia Glaze";
+}
+.ql-font-Kalnia-Amiko {
+  font-family: "Amiko";
+}
 
 .ql-font-Noto-Sans-Devanagari {
   font-family: "Noto Sans Devanagari";
@@ -51,4 +75,85 @@
   .ql-picker-item[data-value="Anek-Devanagari"]::before {
   content: "Devanagari" !important;
   font-family: "Anek Devanagari" !important;
+}
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-label[data-value="Roboto"]::before,
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-item[data-value="Roboto"]::before {
+  content: "Roboto" !important;
+  font-family: "Roboto" !important;
+}
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-label[data-value="Raleway"]::before,
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-item[data-value="Raleway"]::before {
+  content: "Raleway" !important;
+  font-family: "Raleway" !important;
+}
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-label[data-value="Montserrat"]::before,
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-item[data-value="Montserrat"]::before {
+  content: "Montserrat" !important;
+  font-family: "Montserrat" !important;
+}
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-label[data-value="Lato"]::before,
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-item[data-value="Lato"]::before {
+  content: "Lato" !important;
+  font-family: "Lato" !important;
+}
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-label[data-value="Rubik"]::before,
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-item[data-value="Rubik"]::before {
+  content: "Rubik" !important;
+  font-family: "Rubik" !important;
+}
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-label[data-value="Hind"]::before,
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-item[data-value="Hind"]::before {
+  content: "Hind" !important;
+  font-family: "Hind" !important;
+}
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-label[data-value="Cairo"]::before,
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-item[data-value="Cairo"]::before {
+  content: "Cairo" !important;
+  font-family: "Cairo" !important;
+}
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-label[data-value="Amiko"]::before,
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-item[data-value="Amiko"]::before {
+  content: "Amiko" !important;
+  font-family: "Amiko" !important;
+}
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-label[data-value="Kalnia-Glaze"]::before,
+.ql-snow
+  .ql-picker.ql-font
+  .ql-picker-item[data-value="Kalnia-Glaze"]::before {
+  content: "Kalnia Glaze" !important;
+  font-family: "Kalnia Glaze" !important;
 }

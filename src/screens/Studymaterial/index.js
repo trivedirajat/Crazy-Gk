@@ -1,46 +1,56 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { deleteStudyMaterials, fetchStudyMaterials, getStudyMaterialsError, getStudyMaterialsStatus, selectAllStudyMaterials } from "../../redux/Slices/StudyMaterialSlice";
+import {
+  deleteStudyMaterials,
+  fetchStudyMaterials,
+  getStudyMaterialsError,
+  getStudyMaterialsStatus,
+  selectAllStudyMaterials,
+} from "../../redux/Slices/StudyMaterialSlice";
+import { stripHtmlTags } from "utils/stripHtmlTags";
 
 const Study = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const allTopics = useSelector(selectAllStudyMaterials)
-  const status = useSelector(getStudyMaterialsStatus)
-  const error = useSelector(getStudyMaterialsError)
-  const [selectedId, setSelectedId] = useState('')
+  const allTopics = useSelector(selectAllStudyMaterials);
+  const status = useSelector(getStudyMaterialsStatus);
+  const error = useSelector(getStudyMaterialsError);
+  const [selectedId, setSelectedId] = useState("");
   const navigatpage = async (navname) => {
     console.log("navigatpage -> navname", navname);
     navigate(navname);
   };
 
   useEffect(() => {
-    dispatch(fetchStudyMaterials({
-      limit: 200,
-      offset: 0
-    }))
-
-  }, [navigate])
-  useEffect(() => {
-    if (status === 'deleteSucceeded') {
-      dispatch(fetchStudyMaterials({
+    dispatch(
+      fetchStudyMaterials({
         limit: 200,
-        offset: 0
-      }))
+        offset: 0,
+      })
+    );
+  }, [navigate]);
+  useEffect(() => {
+    if (status === "deleteSucceeded") {
+      dispatch(
+        fetchStudyMaterials({
+          limit: 200,
+          offset: 0,
+        })
+      );
     } else {
-
     }
-
-  }, [status, error])
+  }, [status, error]);
 
   const deleteStudy = (e, id) => {
-    dispatch(deleteStudyMaterials({
-      topic_id: id
-    }))
-    setSelectedId('')
-  }
+    dispatch(
+      deleteStudyMaterials({
+        topic_id: id,
+      })
+    );
+    setSelectedId("");
+  };
 
   return (
     <div className="page-body">
@@ -77,7 +87,12 @@ const Study = () => {
               </p>
             </div>
             <div class="modal-footer justify-content-center">
-              <button class="btn btn-success mr-5" type="button" data-dismiss="modal" onClick={(e) => deleteStudy(e, selectedId)}>
+              <button
+                class="btn btn-success mr-5"
+                type="button"
+                data-dismiss="modal"
+                onClick={(e) => deleteStudy(e, selectedId)}
+              >
                 Yes
               </button>
               <button
@@ -103,12 +118,17 @@ const Study = () => {
                   <li class="breadcrumb-item">
                     <a href="index.html">
                       {/* <i data-feather="home"></i> */}
-                      <i class="fa fa-home theme-fa-icon" aria-hidden="true"></i>
+                      <i
+                        class="fa fa-home theme-fa-icon"
+                        aria-hidden="true"
+                      ></i>
                     </a>
                   </li>
                   {/* <li class="breadcrumb-item">Add New User</li>
                                             <li class="breadcrumb-item">Form Layout</li> */}
-                  <li class="breadcrumb-item active">All Study Material Listing</li>
+                  <li class="breadcrumb-item active">
+                    All Study Material Listing
+                  </li>
                 </ol>
               </div>
             </div>
@@ -207,35 +227,34 @@ const Study = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {allTopics && allTopics.map(item => (<tr className="text-center">
-
-                          <td>{item?.subject_name}</td>
-                          <td>{item?.topic_name}</td>
-                          <td>{item?.containt}</td>
-                          <td>Free</td>
-                          <td>
-                            <i
-                              class="fa fa-edit theme-fa-icon mr-3"
-                              aria-hidden="true"
-                              title="Edit Study Material"
-                              onClick={() => {
-                                navigatpage(`/editStudys/${item._id}`);
-                              }}
-                            ></i>
-                            <i
-                              class="fa fa-trash theme-fa-icon"
-                              aria-hidden="true"
-                              title="Delete Study Material"
-                              data-toggle="modal"
-                              data-original-title="test"
-                              data-target="#exampleModal"
-                              onClick={() => setSelectedId(item._id)}
-                            ></i>
-                          </td>
-
-                        </tr>))
-                        }
-
+                        {allTopics &&
+                          allTopics.map((item) => (
+                            <tr className="text-center">
+                              <td>{item?.subject_name}</td>
+                              <td>{item?.topic_name}</td>
+                              <td>{stripHtmlTags(item?.containt || "")}</td>
+                              <td>Free</td>
+                              <td>
+                                <i
+                                  class="fa fa-edit theme-fa-icon mr-3"
+                                  aria-hidden="true"
+                                  title="Edit Study Material"
+                                  onClick={() => {
+                                    navigatpage(`/editStudys/${item._id}`);
+                                  }}
+                                ></i>
+                                <i
+                                  class="fa fa-trash theme-fa-icon"
+                                  aria-hidden="true"
+                                  title="Delete Study Material"
+                                  data-toggle="modal"
+                                  data-original-title="test"
+                                  data-target="#exampleModal"
+                                  onClick={() => setSelectedId(item._id)}
+                                ></i>
+                              </td>
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>

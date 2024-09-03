@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Header from "../../component/Header";
-import SideBar from "../../component/SideNav";
-import Footer from "../../component/Footer";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addSubjects, getsubjectStatus,selectedSubjectWithId } from "../../redux/Slices/SubjectSlice";
