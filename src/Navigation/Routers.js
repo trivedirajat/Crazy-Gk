@@ -144,6 +144,10 @@ function AppRoutes() {
             element={<AddNewJob />}
           />
           <Route
+            path={`${process.env.PUBLIC_URL}/editjob/:jobID`}
+            element={<AddNewJob edit />}
+          />
+          <Route
             path={`${process.env.PUBLIC_URL}/dailyvocab/`}
             element={<DailyVocab />}
           />
