@@ -1,46 +1,55 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { deleteJobs, fetchJobs, getJobsError, getJobsStatus, selectAllJobs } from "../../redux/Slices/JobSlice";
+import {
+  deleteJobs,
+  fetchJobs,
+  getJobsError,
+  getJobsStatus,
+  selectAllJobs,
+} from "../../redux/Slices/JobSlice";
 
 const Job = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const allWhatsnew = useSelector(selectAllJobs)
-  const status = useSelector(getJobsStatus)
-  const error = useSelector(getJobsError)
-  const [selectedId, setSelectedId] = useState('')
+  const allWhatsnew = useSelector(selectAllJobs);
+  const status = useSelector(getJobsStatus);
+  const error = useSelector(getJobsError);
+  const [selectedId, setSelectedId] = useState("");
   const navigatpage = async (navname) => {
     console.log("navigatpage -> navname", navname);
     navigate(navname);
   };
 
   useEffect(() => {
-    dispatch(fetchJobs({
-      limit: 200,
-      offset: 0
-    }))
-
-  }, [navigate])
-  useEffect(() => {
-    if (status === 'deleteSucceeded') {
-      dispatch(fetchJobs({
+    dispatch(
+      fetchJobs({
         limit: 200,
-        offset: 0
-      }))
+        offset: 0,
+      })
+    );
+  }, [navigate]);
+  useEffect(() => {
+    if (status === "deleteSucceeded") {
+      dispatch(
+        fetchJobs({
+          limit: 200,
+          offset: 0,
+        })
+      );
     } else {
-
     }
-
-  }, [status, error])
+  }, [status, error]);
 
   const deletejob = (e, id) => {
-    dispatch(deleteJobs({
-      job_id: id
-    }))
-    setSelectedId('')
-  }
+    dispatch(
+      deleteJobs({
+        job_id: id,
+      })
+    );
+    setSelectedId("");
+  };
 
   return (
     <div className="page-body">
@@ -77,14 +86,19 @@ const Job = () => {
               </p>
             </div>
             <div class="modal-footer justify-content-center">
-              <button class="btn btn-success mr-5" type="button" data-dismiss="modal" onClick={(e) => deletejob(e, selectedId)}>
+              <button
+                class="btn btn-success mr-5"
+                type="button"
+                data-dismiss="modal"
+                onClick={(e) => deletejob(e, selectedId)}
+              >
                 Yes
               </button>
               <button
                 class="btn btn-primary"
                 type="button"
                 data-dismiss="modal"
-                onClick={() => setSelectedId('')}
+                onClick={() => setSelectedId("")}
               >
                 No
               </button>
@@ -104,7 +118,10 @@ const Job = () => {
                   <li class="breadcrumb-item">
                     <a href="index.html">
                       {/* <i data-feather="home"></i> */}
-                      <i class="fa fa-home theme-fa-icon" aria-hidden="true"></i>
+                      <i
+                        class="fa fa-home theme-fa-icon"
+                        aria-hidden="true"
+                      ></i>
                     </a>
                   </li>
                   {/* <li class="breadcrumb-item">Add New User</li>
@@ -126,7 +143,7 @@ const Job = () => {
                     class="btn btn-color"
                     onClick={() => navigatpage("/addjob")}
                   >
-                    Add Job 
+                    Add Job
                   </button>
                 </div>
               </div>
@@ -142,42 +159,40 @@ const Job = () => {
                       <thead>
                         <tr className="text-center">
                           <th scope="col">Title</th>
-                          <th scope="col">Description</th>
+                          <th scope="col">Job Date</th>
                           <th scope="col">Action</th>
                           <th scope="col"></th>
                         </tr>
                       </thead>
                       <tbody>
-                        {allWhatsnew && allWhatsnew.map(item => (
-                          <tr className="text-center">
-
-
-                            <td>{item?.title}</td>
-                            <td>{item?.description}</td>
-                            <td>
-                              <i
-                                class="fa fa-edit theme-fa-icon mr-3"
-                                aria-hidden="true"
-                                title="Edit Job"
-                                onClick={() => {
-                                  navigate(`/addjob`, { state: { id: item?._id } })
-                                }}
-                              ></i>
-                              <i
-                                class="fa fa-trash theme-fa-icon"
-                                aria-hidden="true"
-                                title="Delete Job"
-                                data-toggle="modal"
-                                data-original-title="test"
-                                data-target="#exampleModal"
-                                onClick={() => setSelectedId(item._id)}
-                              ></i>
-                            </td>
-
-                          </tr>
-                        ))}
-
-
+                        {allWhatsnew &&
+                          allWhatsnew.map((item) => (
+                            <tr className="text-center">
+                              <td>{item?.title}</td>
+                              <td>{item?.apply_date}</td>
+                              <td>
+                                <i
+                                  class="fa fa-edit theme-fa-icon mr-3"
+                                  aria-hidden="true"
+                                  title="Edit Job"
+                                  onClick={() => {
+                                    navigate(`/editjob/${item?._id}`, {
+                                      state: { id: item?._id },
+                                    });
+                                  }}
+                                ></i>
+                                <i
+                                  class="fa fa-trash theme-fa-icon"
+                                  aria-hidden="true"
+                                  title="Delete Job"
+                                  data-toggle="modal"
+                                  data-original-title="test"
+                                  data-target="#exampleModal"
+                                  onClick={() => setSelectedId(item._id)}
+                                ></i>
+                              </td>
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>

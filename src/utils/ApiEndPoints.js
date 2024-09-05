@@ -35,6 +35,7 @@ export const apiEndPoints = {
   deleteEBook: "/books/deleteBook",
   // Job
   fetchJob: "/job/getJob",
+  updateJob: "/job/updateJob",
   addJob: "/job/addJob",
   deleteJob: "/job/deleteJob",
   // Rwview
