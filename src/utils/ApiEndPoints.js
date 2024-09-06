@@ -14,7 +14,7 @@ export const apiEndPoints = {
   deleteStudyMaterial: "/studyMaterial/deleteSubjectTopics",
   editStudyMaterial: "/studyMaterial/editSubjectTopics",
   // Current affair
-  getCurrentAffairs: "/currentAffairs/getCurrentAffairs",
+  getCurrentAffairs: "/currentAffairs/getallCurrentAffairs",
   addCurrentAffairs: "/currentAffairs/addCurrentAffairs",
   deleteCurrentAffairs: "/currentAffairs/deleteCurrentAffairs",
   // Blogs

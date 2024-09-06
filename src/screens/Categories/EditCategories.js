@@ -1,34 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { addSubjects, getsubjectStatus, selectedSubjectWithId } from "../../redux/Slices/SubjectSlice";
+import {
+  addSubjects,
+  getsubjectStatus,
+  selectedSubjectWithId,
+} from "../../redux/Slices/SubjectSlice";
+import QuillTextEditor from "screens/Studymaterial/QuillTextEditor";
 
 const EditCategories = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const { id } = useParams();
-
-  const subject = useSelector((state) => selectedSubjectWithId(state, id))
-  const status = useSelector(getsubjectStatus)
-
+  const subject = useSelector((state) => selectedSubjectWithId(state, id));
+  const [content, setContent] = useState(subject[0]?.description || "");
+  const status = useSelector(getsubjectStatus);
 
   useEffect(() => {
-    if (status === 'addSucceeded') {
-      navigatpage('/subjects')
+    if (status === "addSucceeded") {
+      navigatpage("/subjects");
     }
 
-    return () => {
-
-    }
-  }, [status])
-
+    return () => {};
+  }, [status]);
 
   const [subjectData, setSubjectData] = useState({
-    id: subject[0]?._id ?? '',
-    image: subject[0]?.image ?? '',
-    subject_name: subject[0]?.subject_name ?? '',
-    description: subject[0]?.description ?? ''
-  })
+    id: subject[0]?._id ?? "",
+    image: subject[0]?.image ?? "",
+    subject_name: subject[0]?.subject_name ?? "",
+    description: subject[0]?.description ?? "",
+  });
 
   const navigatpage = async (navname) => {
     console.log("navigatpage -> navname", navname);
@@ -38,34 +39,32 @@ const EditCategories = () => {
   const handleValueChange = (event) => {
     const { name, value, type } = event.target;
 
-    if (type === 'file') {
+    if (type === "file") {
       const file = event.target.files[0];
 
-      setSubjectData(prevState => ({
+      setSubjectData((prevState) => ({
         ...prevState,
-        [name]: file
+        [name]: file,
       }));
     } else {
-      setSubjectData(prevState => ({
+      setSubjectData((prevState) => ({
         ...prevState,
-        [name]: value
+        [name]: value,
       }));
     }
-  }
-
-
+  };
 
   const editSubject = (e) => {
-    e.preventDefault()
-    const formData = new FormData()
-    formData.append('subject_id', subjectData.id)
-    formData.append('image', subjectData.image)
-    formData.append('subject_name', subjectData.subject_name)
-    formData.append('description', subjectData.description)
-    dispatch(addSubjects(formData))
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("subject_id", subjectData.id);
+    formData.append("image", subjectData.image);
+    formData.append("subject_name", subjectData.subject_name);
+    formData.append("description", content);
+    dispatch(addSubjects(formData));
     // navigatpage("/subjects")
-  }
-  console.log('subjectData',subject);
+  };
+  console.log("subjectData", subject);
 
   return (
     <div className="page-body">
@@ -146,14 +145,11 @@ const EditCategories = () => {
                         <label htmlFor="exampleFormControlLastName">
                           Description
                         </label>
-                        <input
-                          className="form-control"
+                        <QuillTextEditor
                           id="exampleFormControlLastName"
-                          type="text"
-                          placeholder="Description"
-                          name="description"
-                          value={subjectData.description}
-                          onChange={(e) => handleValueChange(e)}
+                          value={content}
+                          setContent={(newContent) => setContent(newContent)}
+                          style={{ padding: "0" }}
                         />
                       </div>
                     </div>
@@ -162,7 +158,13 @@ const EditCategories = () => {
                 <div className="row">
                   <div className="col-md-12 ">
                     <div className="card-footer float-right">
-                      <button className="btn btn-color" type="submit" onClick={(e) => { editSubject(e) }}>
+                      <button
+                        className="btn btn-color"
+                        type="submit"
+                        onClick={(e) => {
+                          editSubject(e);
+                        }}
+                      >
                         Add
                       </button>
                     </div>

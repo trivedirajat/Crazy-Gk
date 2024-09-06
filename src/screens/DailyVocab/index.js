@@ -1,46 +1,56 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { deleteDailyVocabs, fetchDailyVocabs, getDailyVocabsError, getDailyVocabsStatus, selectAllDailyVocabs } from "../../redux/Slices/DailyVocabSlice";
+import {
+  deleteDailyVocabs,
+  fetchDailyVocabs,
+  getDailyVocabsError,
+  getDailyVocabsStatus,
+  selectAllDailyVocabs,
+} from "../../redux/Slices/DailyVocabSlice";
+import { stripHtmlTags } from "utils/stripHtmlTags";
 
 const DailyVocab = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
-  const allDailyVocab = useSelector(selectAllDailyVocabs)
-  console.log("allDailyVocab",allDailyVocab);
-  const status = useSelector(getDailyVocabsStatus)
-  const error = useSelector(getDailyVocabsError)
-  const [selectedId, setSelectedId] = useState('')
+  const dispatch = useDispatch();
+  const allDailyVocab = useSelector(selectAllDailyVocabs);
+  console.log("allDailyVocab", allDailyVocab);
+  const status = useSelector(getDailyVocabsStatus);
+  const error = useSelector(getDailyVocabsError);
+  const [selectedId, setSelectedId] = useState("");
   const navigatpage = async (navname) => {
     console.log("navigatpage -> navname", navname);
     navigate(navname);
   };
 
   useEffect(() => {
-    dispatch(fetchDailyVocabs({
-      limit: 200,
-      offset: 0
-    }))
-
-  }, [navigate])
-  useEffect(() => {
-    if (status === 'deleteSucceeded') {
-      dispatch(fetchDailyVocabs({
+    dispatch(
+      fetchDailyVocabs({
         limit: 200,
-        offset: 0
-      }))
+        offset: 0,
+      })
+    );
+  }, [navigate]);
+  useEffect(() => {
+    if (status === "deleteSucceeded") {
+      dispatch(
+        fetchDailyVocabs({
+          limit: 200,
+          offset: 0,
+        })
+      );
     } else {
-
     }
-
-  }, [status, error])
+  }, [status, error]);
 
   const deleteDailyVocab = (e, id) => {
-    dispatch(deleteDailyVocabs({
-      dalyVocab_id: id
-    }))
-    setSelectedId('')
-  }
+    dispatch(
+      deleteDailyVocabs({
+        dalyVocab_id: id,
+      })
+    );
+    setSelectedId("");
+  };
 
   return (
     <div className="page-body">
@@ -77,7 +87,12 @@ const DailyVocab = () => {
               </p>
             </div>
             <div class="modal-footer justify-content-center">
-              <button class="btn btn-success mr-5" type="button" data-dismiss="modal" onClick={(e) => deleteDailyVocab(e, selectedId)}>
+              <button
+                class="btn btn-success mr-5"
+                type="button"
+                data-dismiss="modal"
+                onClick={(e) => deleteDailyVocab(e, selectedId)}
+              >
                 Yes
               </button>
               <button
@@ -103,12 +118,17 @@ const DailyVocab = () => {
                   <li class="breadcrumb-item">
                     <a href="index.html">
                       {/* <i data-feather="home"></i> */}
-                      <i class="fa fa-home theme-fa-icon" aria-hidden="true"></i>
+                      <i
+                        class="fa fa-home theme-fa-icon"
+                        aria-hidden="true"
+                      ></i>
                     </a>
                   </li>
                   {/* <li class="breadcrumb-item">Add New User</li>
                                             <li class="breadcrumb-item">Form Layout</li> */}
-                  <li class="breadcrumb-item active">All Daily Vocab Listing</li>
+                  <li class="breadcrumb-item active">
+                    All Daily Vocab Listing
+                  </li>
                 </ol>
               </div>
             </div>
@@ -125,7 +145,7 @@ const DailyVocab = () => {
                     class="btn btn-color"
                     onClick={() => navigatpage("/adddailyvocab")}
                   >
-                    Add Daily Vocab 
+                    Add Daily Vocab
                   </button>
                 </div>
               </div>
@@ -147,36 +167,34 @@ const DailyVocab = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {allDailyVocab && allDailyVocab?.map(item => (
-                          <tr className="text-center">
-
-
-                            <td>{item?.title}</td>
-                            <td>{item?.description}</td>
-                            <td>
-                              <i
-                                class="fa fa-edit theme-fa-icon mr-3"
-                                aria-hidden="true"
-                                title="Edit Daily Vocab"
-                                onClick={() => {
-                                  navigate(`/adddailyvocab`, { state: { id: item?._id } })
-                                }}
-                              ></i>
-                              <i
-                                class="fa fa-trash theme-fa-icon"
-                                aria-hidden="true"
-                                title="Delete Daily Vocab"
-                                data-toggle="modal"
-                                data-original-title="test"
-                                data-target="#exampleModal"
-                                onClick={() => setSelectedId(item._id)}
-                              ></i>
-                            </td>
-
-                          </tr>
-                        ))}
-
-
+                        {allDailyVocab &&
+                          allDailyVocab?.map((item) => (
+                            <tr className="text-center">
+                              <td>{item?.title}</td>
+                              <td>{stripHtmlTags(item?.description || "")}</td>
+                              <td>
+                                <i
+                                  class="fa fa-edit theme-fa-icon mr-3"
+                                  aria-hidden="true"
+                                  title="Edit Daily Vocab"
+                                  onClick={() => {
+                                    navigate(`/adddailyvocab`, {
+                                      state: { id: item?._id },
+                                    });
+                                  }}
+                                ></i>
+                                <i
+                                  class="fa fa-trash theme-fa-icon"
+                                  aria-hidden="true"
+                                  title="Delete Daily Vocab"
+                                  data-toggle="modal"
+                                  data-original-title="test"
+                                  data-target="#exampleModal"
+                                  onClick={() => setSelectedId(item._id)}
+                                ></i>
+                              </td>
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>

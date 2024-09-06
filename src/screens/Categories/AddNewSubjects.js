@@ -1,49 +1,57 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addSubjects, getsubjectStatus,selectedSubjectWithId } from "../../redux/Slices/SubjectSlice";
+import {
+  addSubjects,
+  getsubjectStatus,
+  selectedSubjectWithId,
+  addEditResponse,
+} from "../../redux/Slices/SubjectSlice";
+import QuillTextEditor from "screens/Studymaterial/QuillTextEditor";
 
 const SubjectsListing = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch()
-
-  const status = useSelector(getsubjectStatus)
-  const selectedSubject = useSelector(state => selectedSubjectWithId(state, id !== undefined ? id : 0))
+  const dispatch = useDispatch();
+  const [content, setContent] = useState("");
+  const status = useSelector(getsubjectStatus);
+  const error = useSelector(addEditResponse);
+  console.log("🚀 ~ SubjectsListing ~ status:", status);
+  const selectedSubject = useSelector((state) =>
+    selectedSubjectWithId(state, id !== undefined ? id : 0)
+  );
   const [subjectData, setSubjectData] = useState({
-    image: '',
-    subject_name: '',
-    description: ''
-  })
+    image: "",
+    subject_name: "",
+    description: "",
+  });
   const navigatpage = async (navname) => {
     console.log("navigatpage -> navname", navname);
     navigate(navname);
   };
 
   useEffect(() => {
-    if (status === 'addSucceeded') {
-      navigatpage('/subjects')
+    if (status === "addSucceeded") {
+      navigatpage("/subjects");
     }
 
-    return () => {
-
-    }
-  }, [status])
+    return () => {};
+  }, [status]);
+  useEffect(() => {
+    console.log("🚀 ~ SubjectsListing ~ error:", error);
+    return () => {};
+  }, [error]);
   useEffect(() => {
     if (id !== undefined) {
       setSubjectData({
-        image: selectedSubject[0]?.image ?? '',
-        title: selectedSubject[0]?.subject_name ?? '',
-        description: selectedSubject[0]?.description ?? ''
-      })
+        image: selectedSubject[0]?.image ?? "",
+        title: selectedSubject[0]?.subject_name ?? "",
+        description: selectedSubject[0]?.description ?? "",
+      });
     }
 
-    return () => {
-
-    }
-  }, [id])
-
-
+    return () => {};
+  }, [id]);
 
   // const handleValueChange = (event) => {
   //   const { name, value, type } = event.target;
@@ -64,20 +72,20 @@ const SubjectsListing = () => {
   // }
   const handleValueChange = (event) => {
     const { name, value } = event.target;
-  
-    setSubjectData(prevState => ({
+
+    setSubjectData((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
-  }
+  };
   const addSubject = (e) => {
-    e.preventDefault()
-    const formData = new FormData()
-    formData.append('image', subjectData.image)
-    formData.append('subject_name', subjectData.subject_name)
-    formData.append('description', subjectData.description)
-    dispatch(addSubjects(formData))
-  }
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("image", subjectData.image);
+    formData.append("subject_name", subjectData.subject_name);
+    formData.append("description", content);
+    dispatch(addSubjects(formData));
+  };
 
   return (
     <div className="page-body">
@@ -158,13 +166,11 @@ const SubjectsListing = () => {
                         <label htmlFor="exampleFormControlLastName">
                           Description
                         </label>
-                        <input
-                          className="form-control"
+                        <QuillTextEditor
                           id="exampleFormControlLastName"
-                          type="text"
-                          placeholder="Description"
-                          name="description"
-                          onChange={(e) => handleValueChange(e)}
+                          value={content}
+                          setContent={(newContent) => setContent(newContent)}
+                          style={{ padding: "0" }}
                         />
                       </div>
                     </div>
@@ -173,7 +179,13 @@ const SubjectsListing = () => {
                 <div className="row">
                   <div className="col-md-12 ">
                     <div className="card-footer float-right">
-                      <button className="btn btn-color" type="submit" onClick={(e) => { addSubject(e) }}>
+                      <button
+                        className="btn btn-color"
+                        type="submit"
+                        onClick={(e) => {
+                          addSubject(e);
+                        }}
+                      >
                         Add
                       </button>
                     </div>

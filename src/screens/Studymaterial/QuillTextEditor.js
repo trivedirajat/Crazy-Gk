@@ -105,7 +105,7 @@ export default function QuillTextEditor({
   return (
     <ReactQuill
       ref={ref}
-      style={{ height: "500px", width: "100%", ...style }} // Uncomment and check styling once
+      style={{ Maxheight: "500px", width: "100%", ...style }} // Uncomment and check styling once
       className="container"
       theme="snow"
       value={value}

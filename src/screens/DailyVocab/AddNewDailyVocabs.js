@@ -5,8 +5,7 @@
 // import { useLocation, useNavigate, useParams } from "react-router-dom";
 // import { useDispatch, useSelector } from "react-redux";
 // import { addDailyVocabs,getDailyVocabsStatus, selectedDailyVocabsWithId } from "../../redux/Slices/DailyVocabSlice";
-  
-  
+
 // const AddNewDailyVocab = () => {
 //   const navigate = useNavigate();
 //   const location = useLocation()
@@ -49,9 +48,6 @@
 
 //     }
 //   }, [id])
-
-
-
 
 //   const handleValueChange = (event) => {
 //     const { name, value, type } = event.target;
@@ -192,72 +188,78 @@ import SideBar from "../../component/SideNav";
 import Footer from "../../component/Footer";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { addDailyVocabs,getDailyVocabsStatus, selectedDailyVocabsWithId } from "../../redux/Slices/DailyVocabSlice";
+import {
+  addDailyVocabs,
+  getDailyVocabsStatus,
+  selectedDailyVocabsWithId,
+} from "../../redux/Slices/DailyVocabSlice";
+import QuillTextEditor from "screens/Studymaterial/QuillTextEditor";
 
 const AddNewDailyVocab = () => {
-  const location = useLocation()
-  const { id } = location.state || {}
-  console.log("id",id)
+  const location = useLocation();
+  const { id } = location.state || {};
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const status = useSelector(getDailyVocabsStatus)
-  const selectedDailyVocabs = useSelector(state => selectedDailyVocabsWithId(state, id !== undefined ? id : 0))
+  const status = useSelector(getDailyVocabsStatus);
+  const selectedDailyVocabs = useSelector((state) =>
+    selectedDailyVocabsWithId(state, id !== undefined ? id : 0)
+  );
+  const [content, setContent] = useState(
+    selectedDailyVocabs[0]?.description ?? ""
+  );
   const [dailyVocabsData, setDailyVocabsData] = useState({
-    title: '',
-    description: ''
-  })
+    title: "",
+    description: "",
+  });
   const navigatpage = async (navname) => {
     console.log("navigatpage -> navname", navname);
     navigate(navname);
   };
 
   useEffect(() => {
-    if (status === 'addSucceeded') {
-      navigatpage('/dailyvocab')
+    if (status === "addSucceeded") {
+      navigatpage("/dailyvocab");
     }
 
-    return () => {
-
-    }
-  }, [status])
+    return () => {};
+  }, [status]);
   useEffect(() => {
     if (id !== undefined) {
       setDailyVocabsData({
-        title: selectedDailyVocabs[0]?.title ?? '',
-        description: selectedDailyVocabs[0]?.description ?? ''
-      })
+        title: selectedDailyVocabs[0]?.title ?? "",
+        description: selectedDailyVocabs[0]?.description ?? "",
+      });
     }
 
-    return () => {
-
-    }
-  }, [id])
-
-
+    return () => {};
+  }, [id]);
 
   const handleValueChange = (event) => {
     const { name, value } = event.target;
 
-      setDailyVocabsData(prevState => ({
-        ...prevState,
-        [name]: value
-      }));
+    setDailyVocabsData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
     // }
-  }
- 
+  };
+
   const adddailyvocab = (e) => {
-    e.preventDefault()
-    const params = id !== undefined ? {
-      dalyVocab_id: id,
-      title: dailyVocabsData.title ?? '',
-      description: dailyVocabsData.description ?? ''
-    } : {
-      title: dailyVocabsData.title ?? '',
-      description: dailyVocabsData.description ?? ''
-    }
-    dispatch(addDailyVocabs(params))
-  }
+    e.preventDefault();
+    const params =
+      id !== undefined
+        ? {
+            dalyVocab_id: id,
+            title: dailyVocabsData.title ?? "",
+            description: content ?? "",
+          }
+        : {
+            title: dailyVocabsData.title ?? "",
+            description: content ?? "",
+          };
+    dispatch(addDailyVocabs(params));
+  };
   // const adddailyvocab = (e) => {
   //   e.preventDefault()
   //   dispatch(addDailyVocabs({
@@ -286,9 +288,11 @@ const AddNewDailyVocab = () => {
                       navigatpage("/dailyvocabs");
                     }}
                   >
-                  Daily vocabs Listing
+                    Daily vocabs Listing
                   </li>
-                  <li className="breadcrumb-item active">Add New Daily vocabs</li>
+                  <li className="breadcrumb-item active">
+                    Add New Daily vocabs
+                  </li>
                 </ol>
               </div>
             </div>
@@ -328,15 +332,11 @@ const AddNewDailyVocab = () => {
                         <label htmlFor="exampleFormControlLastName">
                           Description
                         </label>
-                        <input
-                          className="form-control"
+                        <QuillTextEditor
                           id="exampleFormControlLastName"
-                          type="text"
-                          placeholder="Description"
-                          name="description"
-                       
-                          value={dailyVocabsData.description}
-                          onChange={(e) => handleValueChange(e)}
+                          value={content}
+                          setContent={(newContent) => setContent(newContent)}
+                          style={{ padding: "0" }}
                         />
                       </div>
                     </div>
@@ -345,7 +345,13 @@ const AddNewDailyVocab = () => {
                 <div className="row">
                   <div className="col-md-12 ">
                     <div className="card-footer float-right">
-                      <button className="btn btn-color" type="submit" onClick={(e) => { adddailyvocab(e) }}>
+                      <button
+                        className="btn btn-color"
+                        type="submit"
+                        onClick={(e) => {
+                          adddailyvocab(e);
+                        }}
+                      >
                         Add
                       </button>
                     </div>
