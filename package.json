@@ -15,6 +15,7 @@
     "@xeger/quill-image-formats": "^0.7.2",
     "axios": "^1.6.8",
     "jodit-react": "^4.0.25",
+    "quill-image-compress": "^2.0.2",
     "quill-image-drop-module": "^1.0.3",
     "react": "^18.2.0",
     "react-datepicker": "^4.8.0",

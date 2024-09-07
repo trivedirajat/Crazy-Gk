@@ -3,44 +3,56 @@ import Header from "../../component/Header";
 import SideBar from "../../component/SideNav";
 import Footer from "../../component/Footer";
 import { useNavigate, useParams } from "react-router-dom";
-import { fetchSubjects, selectAllsubject } from "../../redux/Slices/SubjectSlice";
+import {
+  fetchSubjects,
+  selectAllsubject,
+} from "../../redux/Slices/SubjectSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { addCureentAffairs, getCurrentAffairsStatus, selectedCurrentAffairsWithId } from "../../redux/Slices/CurrentAffairsSlice";
+import {
+  addCureentAffairs,
+  getCurrentAffairsStatus,
+  selectedCurrentAffairsWithId,
+} from "../../redux/Slices/CurrentAffairsSlice";
+import QuillTextEditor from "screens/Studymaterial/QuillTextEditor";
 
 const EditCurrentAffairs = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
-  const { id } = useParams()
-  const allSubjects = useSelector(selectAllsubject)
-  const status = useSelector(getCurrentAffairsStatus)
-  const selectedAffair = useSelector(state => selectedCurrentAffairsWithId(state, id))
-console.log("selectedAffair",selectedAffair)
-  const [affairTopicContent, setAffairTopicContent] = useState([{
-    title: '',
-    description: ''
-  }])
+  const dispatch = useDispatch();
+  const { id } = useParams();
+  const selectedAffair = useSelector((state) =>
+    selectedCurrentAffairsWithId(state, id)
+  );
+  const [content, setContent] = useState(selectedAffair[0]?.description || "");
+  const allSubjects = useSelector(selectAllsubject);
+  const status = useSelector(getCurrentAffairsStatus);
+  console.log("selectedAffair", selectedAffair);
+  const [affairTopicContent, setAffairTopicContent] = useState([
+    {
+      title: "",
+      description: "",
+    },
+  ]);
   const [affairData, setAffairData] = useState({
-    subject_id: '',
-    title: selectedAffair[0]?.title ?? '',
-    description: selectedAffair[0]?.description ?? ''
-  })
+    subject_id: "",
+    title: selectedAffair[0]?.title ?? "",
+    description: selectedAffair[0]?.description ?? "",
+  });
 
   useEffect(() => {
-    dispatch(fetchSubjects({
-      limit: 200,
-      offset: 0
-    }))
-
-  }, [navigate])
+    dispatch(
+      fetchSubjects({
+        limit: 200,
+        offset: 0,
+      })
+    );
+  }, [navigate]);
   useEffect(() => {
-    if (status === 'addSucceeded') {
-      navigatpage('/currentaffairs')
+    if (status === "addSucceeded") {
+      navigatpage("/currentaffairs");
     }
 
-    return () => {
-
-    }
-  }, [status])
+    return () => {};
+  }, [status]);
 
   const navigatpage = async (navname) => {
     console.log("navigatpage -> navname", navname);
@@ -49,14 +61,17 @@ console.log("selectedAffair",selectedAffair)
 
   const handleValueChange = (event) => {
     const { name, value } = event.target;
-    setAffairData(prevState => ({
+    setAffairData((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
-  }
+  };
 
   const addVideoField = () => {
-    setAffairTopicContent([...affairTopicContent, { title: '', description: '' }]);
+    setAffairTopicContent([
+      ...affairTopicContent,
+      { title: "", description: "" },
+    ]);
   };
 
   const removeVideoField = (index) => {
@@ -72,13 +87,15 @@ console.log("selectedAffair",selectedAffair)
   };
 
   const EditAffair = (e) => {
-    e.preventDefault()
-    dispatch(addCureentAffairs({
-      currentAffairs_id: id,
-      title: affairData?.title ?? '',
-      description: affairData?.description ?? ''
-    }))
-  }
+    e.preventDefault();
+    dispatch(
+      addCureentAffairs({
+        currentAffairs_id: id,
+        title: affairData?.title ?? "",
+        description: content ?? "",
+      })
+    );
+  };
 
   return (
     <div className="page-body">
@@ -102,7 +119,9 @@ console.log("selectedAffair",selectedAffair)
                   >
                     All Current Affairs Listing
                   </li>
-                  <li class="breadcrumb-item active">Add New Current Affairs</li>
+                  <li class="breadcrumb-item active">
+                    Add New Current Affairs
+                  </li>
                 </ol>
               </div>
             </div>
@@ -178,14 +197,11 @@ console.log("selectedAffair",selectedAffair)
                         <label for="exampleFormControlLastName">
                           Description
                         </label>
-                        <input
-                          class="form-control"
+                        <QuillTextEditor
                           id="exampleFormControlLastName"
-                          type="text"
-                          placeholder="description"
-                          name="description"
-                          value={affairData.description}
-                          onChange={(val) => handleValueChange(val)}
+                          value={content}
+                          setContent={(newContent) => setContent(newContent)}
+                          style={{ padding: "0" }}
                         />
                       </div>
                     </div>
@@ -239,13 +255,17 @@ console.log("selectedAffair",selectedAffair)
                       </div>
                     </div>
                   </div> */}
-
-
                 </div>
                 <div className="row">
                   <div className="col-md-12 ">
                     <div className="card-footer float-right">
-                      <button className="btn btn-color" type="submit" onClick={(e) => { EditAffair(e) }}>
+                      <button
+                        className="btn btn-color"
+                        type="submit"
+                        onClick={(e) => {
+                          EditAffair(e);
+                        }}
+                      >
                         Update
                       </button>
                     </div>

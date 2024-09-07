@@ -9,6 +9,7 @@ import {
   selectAllStudyMaterials,
 } from "../../redux/Slices/StudyMaterialSlice";
 import { stripHtmlTags } from "utils/stripHtmlTags";
+import toast from "react-hot-toast";
 
 const Study = () => {
   const navigate = useNavigate();
@@ -40,15 +41,19 @@ const Study = () => {
         })
       );
     } else {
+      
     }
   }, [status, error]);
 
-  const deleteStudy = (e, id) => {
-    dispatch(
+  const deleteStudy = async (e, id) => {
+    const res = await dispatch(
       deleteStudyMaterials({
         topic_id: id,
       })
     );
+    if (res?.meta?.requestStatus === "fulfilled") {
+      toast.success("Study Materials deleted successfully");
+    }
     setSelectedId("");
   };
 

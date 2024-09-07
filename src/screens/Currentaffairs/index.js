@@ -1,46 +1,56 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { deleteCureentAffairs, fetchCureentAffairs, getCurrentAffairsError, getCurrentAffairsStatus, selectAllCurrentAffairs } from "../../redux/Slices/CurrentAffairsSlice";
+import {
+  deleteCureentAffairs,
+  fetchCureentAffairs,
+  getCurrentAffairsError,
+  getCurrentAffairsStatus,
+  selectAllCurrentAffairs,
+} from "../../redux/Slices/CurrentAffairsSlice";
+import { stripHtmlTags } from "utils/stripHtmlTags";
 
 const CurrentAffairsList = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const allCurrentAffairs = useSelector(selectAllCurrentAffairs)
-  const status = useSelector(getCurrentAffairsStatus)
-  const error = useSelector(getCurrentAffairsError)
-  const [selectedId, setSelectedId] = useState('')
+  const allCurrentAffairs = useSelector(selectAllCurrentAffairs);
+  const status = useSelector(getCurrentAffairsStatus);
+  const error = useSelector(getCurrentAffairsError);
+  const [selectedId, setSelectedId] = useState("");
   const navigatpage = async (navname) => {
     console.log("navigatpage -> navname", navname);
     navigate(navname);
   };
 
   useEffect(() => {
-    dispatch(fetchCureentAffairs({
-      limit: 200,
-      offset: 0
-    }))
-
-  }, [navigate])
-  useEffect(() => {
-    if (status === 'deleteSucceeded') {
-      dispatch(fetchCureentAffairs({
+    dispatch(
+      fetchCureentAffairs({
         limit: 200,
-        offset: 0
-      }))
+        offset: 0,
+      })
+    );
+  }, [navigate]);
+  useEffect(() => {
+    if (status === "deleteSucceeded") {
+      dispatch(
+        fetchCureentAffairs({
+          limit: 200,
+          offset: 0,
+        })
+      );
     } else {
-
     }
-
-  }, [status, error])
+  }, [status, error]);
 
   const deleteAffairs = (e, id) => {
-    dispatch(deleteCureentAffairs({
-      currentAffairs_id: id
-    }))
-    setSelectedId('')
-  }
+    dispatch(
+      deleteCureentAffairs({
+        currentAffairs_id: id,
+      })
+    );
+    setSelectedId("");
+  };
 
   return (
     <div className="page-body">
@@ -77,7 +87,12 @@ const CurrentAffairsList = () => {
               </p>
             </div>
             <div class="modal-footer justify-content-center">
-              <button class="btn btn-success mr-5" type="button" data-dismiss="modal" onClick={(e) => deleteAffairs(e, selectedId)}>
+              <button
+                class="btn btn-success mr-5"
+                type="button"
+                data-dismiss="modal"
+                onClick={(e) => deleteAffairs(e, selectedId)}
+              >
                 Yes
               </button>
               <button
@@ -103,12 +118,17 @@ const CurrentAffairsList = () => {
                   <li class="breadcrumb-item">
                     <a href="index.html">
                       {/* <i data-feather="home"></i> */}
-                      <i class="fa fa-home theme-fa-icon" aria-hidden="true"></i>
+                      <i
+                        class="fa fa-home theme-fa-icon"
+                        aria-hidden="true"
+                      ></i>
                     </a>
                   </li>
                   {/* <li class="breadcrumb-item">Add New User</li>
                                             <li class="breadcrumb-item">Form Layout</li> */}
-                  <li class="breadcrumb-item active">All Current Affairs Listing</li>
+                  <li class="breadcrumb-item active">
+                    All Current Affairs Listing
+                  </li>
                 </ol>
               </div>
             </div>
@@ -150,35 +170,35 @@ const CurrentAffairsList = () => {
                         </tr>
                       </thead>
                       <tbody>
-                         {allCurrentAffairs && allCurrentAffairs.map(item => (
-                          <tr className="text-center">
-                            <td>{item?.title}</td>
-                            <td>{item?.description}</td>
-                            <td>Free</td>
-                            <td>
-                              <i
-                                class="fa fa-edit theme-fa-icon mr-3"
-                                aria-hidden="true"
-                                title="Edit Current Affairs"
-                                onClick={() => {
-                                  navigatpage(`/editcurrentaffairs/${item?._id}`);
-                                }}
-                              ></i>
-                              <i
-                                class="fa fa-trash theme-fa-icon"
-                                aria-hidden="true"
-                                title="Delete Current Affairs"
-                                data-toggle="modal"
-                                data-original-title="test"
-                                data-target="#exampleModal"
-                                onClick={() => setSelectedId(item._id)}
-                              ></i>
-                            </td>
-
-                          </tr>
-                        ))} 
-
-
+                        {allCurrentAffairs &&
+                          allCurrentAffairs.map((item) => (
+                            <tr className="text-center">
+                              <td>{item?.title}</td>
+                              <td>{stripHtmlTags(item?.description)}</td>
+                              <td>Free</td>
+                              <td>
+                                <i
+                                  class="fa fa-edit theme-fa-icon mr-3"
+                                  aria-hidden="true"
+                                  title="Edit Current Affairs"
+                                  onClick={() => {
+                                    navigatpage(
+                                      `/editcurrentaffairs/${item?._id}`
+                                    );
+                                  }}
+                                ></i>
+                                <i
+                                  class="fa fa-trash theme-fa-icon"
+                                  aria-hidden="true"
+                                  title="Delete Current Affairs"
+                                  data-toggle="modal"
+                                  data-original-title="test"
+                                  data-target="#exampleModal"
+                                  onClick={() => setSelectedId(item._id)}
+                                ></i>
+                              </td>
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>

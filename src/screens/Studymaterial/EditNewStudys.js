@@ -5,11 +5,6 @@ import {
   selectAllsubject,
 } from "../../redux/Slices/SubjectSlice";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addStudyMaterials,
-  getStudyMaterialsStatus,
-  selectedStudyMaterialsWithId,
-} from "../../redux/Slices/StudyMaterialSlice";
 
 import "../../App.css";
 import QuillTextEditor from "./QuillTextEditor";
@@ -17,6 +12,8 @@ import {
   useEditStudyMutation,
   useGetStudymaterialQuery,
 } from "../../redux/apis/studyapis";
+import { stripHtmlTags } from "utils/stripHtmlTags";
+import toast from "react-hot-toast";
 
 const AddStudysMaterial = () => {
   const navigate = useNavigate();
@@ -26,6 +23,7 @@ const AddStudysMaterial = () => {
     { id },
     {
       skip: !id,
+      refetchOnMountOrArgChange: true,
     }
   );
   const [editStudy] = useEditStudyMutation();
@@ -73,6 +71,10 @@ const AddStudysMaterial = () => {
   }, [data]);
   const editStudyMaterial = async (e) => {
     e.preventDefault();
+    if (stripHtmlTags(content).length > 600) {
+      toast.error("Content length should be less than 100");
+      return;
+    }
     const data = {
       id,
       subject_id: studyData.subject_id,

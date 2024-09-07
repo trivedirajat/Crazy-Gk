@@ -1,15 +1,17 @@
-import React from "react";
+import React, { forwardRef, useImperativeHandle, useEffect } from "react";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { ImageDrop } from "quill-image-drop-module";
 import { ImageActions } from "@xeger/quill-image-actions";
 import { ImageFormats } from "@xeger/quill-image-formats";
-// import { io } from 'socket.io-client';
+import ImageCompress from "quill-image-compress";
 
-// Register the custom modules
+// Register custom modules
+Quill.register("modules/imageCompress", ImageCompress);
 Quill.register("modules/imageDrop", ImageDrop);
 Quill.register("modules/imageActions", ImageActions);
 Quill.register("modules/imageFormats", ImageFormats);
+
 const FontAttributor = Quill.import("attributors/class/font");
 FontAttributor.whitelist = [
   "Roboto",
@@ -27,6 +29,7 @@ FontAttributor.whitelist = [
   "monospace",
 ];
 Quill.register(FontAttributor, true);
+
 const formats = [
   "align",
   "background",
@@ -67,54 +70,44 @@ const modules = {
     [{ align: [] }],
     ["clean"],
   ],
+  imageCompress: {
+    quality: 0.6,
+    maxWidth: 1000,
+    maxHeight: 1000,
+    imageType: "image/jpeg",
+    debug: false,
+    suppressErrorLogging: false,
+    handleOnPaste: true,
+    insertIntoEditor: undefined,
+  },
   imageActions: {},
   imageFormats: {},
   imageDrop: true,
 };
 
-export default function QuillTextEditor({
-  value,
-  setContent,
-  ref,
-  style,
-  ...props
-}) {
-  //   const [value, setValue] = useState('');
-  //   const [socket, setSocket] = useState(null);
+// Forward ref to access ReactQuill instance
+const QuillTextEditor = forwardRef(
+  ({ value, setContent, style, ...props }, ref) => {
+    // Use imperative handle to expose methods if needed
+    useImperativeHandle(ref, () => ({
+      getEditor: () => quillRef.current.getEditor(),
+    }));
 
-  //   useEffect(() => {
-  //     const s = io("http://localhost:3001");
-  //     setSocket(s);
+    const quillRef = React.useRef(null);
 
-  //     s.on('document-update', (newValue) => {
-  //       setValue(newValue);
-  //     });
+    return (
+      <ReactQuill
+        ref={ref}
+        style={{ maxHeight: "500px", width: "100%", ...style }}
+        theme="snow"
+        value={value}
+        onChange={(value) => setContent(value)}
+        modules={modules}
+        formats={formats}
+        {...props}
+      />
+    );
+  }
+);
 
-  //     return () => {
-  //       s.disconnect();
-  //     };
-  //   }, []);
-
-  //   const handleChange = (content, delta, source, editor) => {
-  //     setValue(content);
-  //     if (socket && source === 'user') {
-  //       socket.emit('document-change', content);
-  //     }
-  //   };
-
-  return (
-    <ReactQuill
-      ref={ref}
-      style={{ height: "500px", width: "100%", ...style }} // Uncomment and check styling once
-      className="container"
-      theme="snow"
-      value={value}
-      tabIndex={1}
-      //   onBlur={(value) => setContent(value)} //<======= Throwing error. Check Once =======>
-      onChange={(value) => setContent(value)}
-      modules={modules}
-      formats={formats}
-      {...props}
-    />
-  );
-}
+export default QuillTextEditor;
