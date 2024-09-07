@@ -1,120 +1,110 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { selectAllreviews,fetchReviews,deleteReviews ,getreviewError,getreviewStatus} from "../../redux/Slices/ReviewsSlice";
+import React, { useState } from "react";
+import { DataGrid } from "@mui/x-data-grid";
+import CustomDialog from "../../component/common/CustomDialog";
+import {
+  useDeleteReviewMutation,
+  useGetReviewsQuery,
+} from "../../redux/apis/reviewapis";
+import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Typography,
+} from "@mui/material";
 
-const Reviews = () => {
+const ReviewsDataGrid = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
-  
-  
-  
-//   selectAllreviews
-// getreviewStatus
-// getreviewError
-// addEditResponse
-// selectedreviewWithId
-  const allReviews = useSelector(selectAllreviews)
-  const status = useSelector(getreviewStatus)
-  const error = useSelector(getreviewError)
-  const [selectedId, setSelectedId] = useState('')
-  const navigatpage = async (navname) => {
-    console.log("navigatpage -> navname", navname);
-    navigate(navname);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 1,
+    pageSize: 10,
+  });
+  const [deleteReview] = useDeleteReviewMutation();
+  const [dialog, setDialog] = useState({
+    open: false,
+    id: "",
+  });
+
+  const {
+    data: reviews,
+    isLoading,
+    isError,
+  } = useGetReviewsQuery(
+    { page: paginationModel.page, limit: paginationModel.pageSize },
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
+
+  if (isError) {
+    toast.error("Could not fetch reviews. Try again");
+    console.error("Error fetching reviews:", isError);
+  }
+
+  const handleConformDelete = async () => {
+    try {
+      await deleteReview(dialog.id).unwrap();
+      toast.success("Review deleted successfully");
+    } catch (error) {
+      toast.error("Could not delete. Try again");
+    }
+    setDialog({ open: false, id: "" });
   };
 
-  useEffect(() => {
-    dispatch(fetchReviews({
-      limit: 200,
-      offset: 0
-    }))
+  const handleEdit = (id) => {
+    navigate(`/editreview/${id}`);
+  };
 
-  }, [navigate])
-
-  useEffect(() => {
-  if(status === 'deleteSucceeded'){
-    
-  }else {
-    
-  }
-
-  }, [status,error])
-
-  const deleteReview = (e, id) => {
-    dispatch(deleteReviews({
-      review_id: id
-    }))
-    setSelectedId('')
-  }
+  const columns = [
+    { field: "name", headerName: "Name", flex: 0.1 },
+    { field: "review", headerName: "Review", flex: 0.7 },
+    { field: "rating", headerName: "Rating", flex: 0.1 },
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 0.1,
+      width: 150,
+      renderCell: (params) => (
+        <div>
+          <i
+            className="fa fa-edit theme-fa-icon mr-3"
+            aria-hidden="true"
+            title="Edit Review"
+            onClick={() => handleEdit(params.row._id)}
+          ></i>
+          <i
+            className="fa fa-trash theme-fa-icon"
+            aria-hidden="true"
+            title="Delete Review"
+            onClick={() => setDialog({ open: true, id: params.row._id })}
+          ></i>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div className="page-body">
-      {/* Model_start */}
-      <div
-        class="modal fade"
-        id="exampleModal"
-        tabIndex="-1"
-        role="dialog"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">
-                Remove Review
-              </h5>
-              <button
-                class="close"
-                type="button"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">×</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p className="text-center">
-                <h6>Are You Sure ?</h6>
-              </p>
-              <p className="text-center">
-                <h6>Remove This Review</h6>
-              </p>
-            </div>
-            <div class="modal-footer justify-content-center">
-              <button class="btn btn-success mr-5" type="button" data-dismiss="modal" onClick={(e) => deleteReview(e, selectedId)}>
-                Yes
-              </button>
-              <button
-                class="btn btn-primary"
-                type="button"
-                data-dismiss="modal"
-                onClick={() => setSelectedId('')}
-              >
-                No
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* Model_end */}
-
-      <div class="container-fluid">
-        <div class="page-header">
-          <div class="row">
-            <div class="col">
-              <div class="page-header-left">
-                <h3>Reviews</h3>
-                <ol class="breadcrumb">
-                  <li class="breadcrumb-item">
-                    <a href="index.html">
-                      {/* <i data-feather="home"></i> */}
-                      <i class="fa fa-home theme-fa-icon" aria-hidden="true"></i>
-                    </a>
+      <div className="container-fluid">
+        <div className="page-header">
+          <div className="row">
+            <div className="col">
+              <div className="page-header-left">
+                <Typography variant="h3">All Reviews</Typography>
+                <ol className="breadcrumb">
+                  <li className="breadcrumb-item">
+                    <Link to="/">
+                      <i
+                        className="fa fa-home theme-fa-icon"
+                        aria-hidden="true"
+                      ></i>
+                    </Link>
                   </li>
-                  {/* <li class="breadcrumb-item">Add New User</li>
-                                            <li class="breadcrumb-item">Form Layout</li> */}
-                  <li class="breadcrumb-item active">Reviews Listing</li>
+                  <li className="breadcrumb-item active">
+                    All Reviews Listing
+                  </li>
                 </ol>
               </div>
             </div>
@@ -122,113 +112,61 @@ const Reviews = () => {
         </div>
       </div>
       <div className="container-fluid">
-        <div class="row">
-          <div class="col-sm-12 col-xl-12">
+        <div className="row">
+          <div className="col-sm-12 col-xl-12">
             <div className="row pt-3">
               <div className="col-md-6">
-                <div class="form-group">
-                  <button
-                    class="btn btn-color"
-                    onClick={() => navigatpage("/addreview")}
+                <div className="form-group">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => navigate("/addreview")}
                   >
-                    Add New Reviews
-                  </button>
+                    Add New Review
+                  </Button>
                 </div>
               </div>
             </div>
-            {/* All subject List */}
-            <div class="row">
-              <div class="col-sm-12 col-xl-12">
-                <div class="card">
-                  <div class="card-header">
-                    <h5>List of Reviews:</h5>
-                  </div>
-                  <div class="table-responsive">
-                    <table class="table table-border-horizontal">
-                      <thead>
-                        <tr className="text-center">
-                          <th scope="col">Reviews</th>
-                          <th scope="col">FeedBacks</th>
-                          <th scope="col">User Name</th>
-                          <th scope="col">Action</th>
-                          <th scope="col"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {allReviews && allReviews.map((item, index) => (
-                          <tr className="text-center">
-
-                          <td>{item?.review}</td>
-                          <td>{item?.rating}</td>
-                          <td>{item?.user_name}</td>
-                            <td>
-                            <i
-                                class="fa fa-edit theme-fa-icon mr-3"
-                                aria-hidden="true"
-                                title="Edit Review"
-                                onClick={() => {
-                                  navigate(`/addreview`, { state: { id: item?._id } })
-                                }}
-                              ></i>
-                             { /*<i
-                                class="fa fa-edit theme-fa-icon mr-3" 
-                                aria-hidden="true"
-                                title="Edit Subject"
-                                onClick={() => {
-                                  navigatpage(`/addreview`, { state: { id: item?._id } });
-                                }}
-                              ></i>*/}
-                              <i
-                                class="fa fa-trash theme-fa-icon"
-                                aria-hidden="true"
-                                title="Delete Review"
-                                data-toggle="modal"
-                                data-original-title="test"
-                                data-target="#exampleModal"
-                                onClick={() => setSelectedId(item._id)}
-                              ></i>
-                            </td>
-
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div class="col-12  ">
-                      <div class="card ">
-                        <div class="card-body ">
-                          <nav aria-label="Page navigation example ">
-                            <ul class="pagination pagination-primary float-right">
-                              <li class="page-item">
-                                <a class="page-link">Previous</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">1</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">2</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">3</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">Next</a>
-                              </li>
-                            </ul>
-                          </nav>
-                        </div>
-                      </div>
+            <div className="row">
+              <div className="col-sm-12 col-xl-12">
+                <Card>
+                  <CardHeader title="List of Reviews:" />
+                  <CardContent>
+                    <div style={{ height: 400, width: "100%" }}>
+                      <DataGrid
+                        rows={reviews?.reviews || []}
+                        columns={columns}
+                        rowCount={reviews?.total || 0} // Ensure this reflects the total rows
+                        pagination
+                        paginationMode="server"
+                        disableRowSelectionOnClick
+                        paginationModel={paginationModel}
+                        pageSizeOptions={[10, 25, 50, 100]}
+                        onPaginationModelChange={setPaginationModel}
+                        loading={isLoading}
+                        getRowId={(row) => row._id}
+                      />
                     </div>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      <CustomDialog
+        open={dialog.open}
+        title="Are you sure you want to delete this review?"
+        onClose={() => setDialog({ open: false, id: "" })}
+        onConfirm={handleConformDelete}
+        confirmText="Confirm"
+        cancelText="Cancel"
+        cancelButtonColor="error"
+        content=""
+      />
     </div>
   );
 };
-export default Reviews;
+
+export default ReviewsDataGrid;

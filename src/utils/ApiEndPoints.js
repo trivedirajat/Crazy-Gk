@@ -39,10 +39,12 @@ export const apiEndPoints = {
   addJob: "/job/addJob",
   deleteJob: "/job/deleteJob",
   // Rwview
-  fetchReview: "/review/getReview",
+  getReviews: "/review/getReviews",
+  getreviewnyid: "/review/getreviewbyid",
   addReview: "/review/addReview",
-  // Question
+  editReview: "/review/editReview",
   deleteReview: "/review/reviewDelete",
+  // Question
   addQuestion: "/question/addQuestion",
   getQustions: "/question/",
   editQuestion: "/question/editQuestion",
