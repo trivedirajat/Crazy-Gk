@@ -204,12 +204,7 @@ const AddCurrentAffairs = () => {
                         /> */}
                     {/* </div> */}
                     {/* </div> */}
-                    <div
-                      style={{
-                        width: "100%",
-                        height: "50%",
-                      }}
-                    >
+                    <div class="col-md-8">
                       <QuillTextEditor
                         ref={editor}
                         value={content}
