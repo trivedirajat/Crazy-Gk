@@ -24,7 +24,7 @@ import {
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 
-const QuizForm = ({  Isedit = false }) => {
+const QuizForm = ({ Isedit = false }) => {
   const { Quizid } = useParams();
   const [editQuiz] = useEditQuizMutation();
   const { data: Quize = [] } = useGetQuizQuery(
@@ -55,6 +55,7 @@ const QuizForm = ({  Isedit = false }) => {
       passingMarks: "",
       negativeMarks: "",
       isPublished: true,
+      isFeatured: false,
     },
   });
 
@@ -111,6 +112,7 @@ const QuizForm = ({  Isedit = false }) => {
         passingMarks,
         negativeMarks,
         isPublished,
+        isFeatured,
       } = Quize?.data;
       getquestionlist(subject, questionList);
       setValue("name", name);
@@ -120,6 +122,7 @@ const QuizForm = ({  Isedit = false }) => {
       setValue("passingMarks", passingMarks);
       setValue("negativeMarks", negativeMarks);
       setValue("isPublished", isPublished);
+      setValue("isFeatured", isFeatured);
     }
   }, [Quize, setValue]);
 
@@ -149,149 +152,153 @@ const QuizForm = ({  Isedit = false }) => {
   };
 
   return (
-    <Box
-      sx={{
-        maxWidth: 800,
-        mx: "auto",
-        mt: 4,
-        p: 3,
-      }}
-    >
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Typography variant="h6">Quiz Form</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Controller
-              name="name"
-              control={control}
-              rules={{
-                required: "Name is required",
-                minLength: {
-                  value: 5,
-                  message: "Name must be at least 5 characters long",
-                },
-              }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Name"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  error={!!errors.name}
-                  helperText={errors.name ? errors.name.message : ""}
-                />
-              )}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Controller
-              name="description"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Description"
-                  variant="outlined"
-                  size="small"
-                  fullWidth
-                  multiline
-                  rows={4}
-                  error={!!errors.description}
-                  helperText={
-                    errors.description ? errors.description.message : ""
-                  }
-                />
-              )}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Controller
-              rules={{ required: "Subject is required" }}
-              name="subject"
-              control={control}
-              render={({ field }) => (
-                <FormControl fullWidth margin="dense" size="small">
-                  <InputLabel shrink>Subject</InputLabel>
-                  <Select
-                    {...field}
-                    label="Subject"
-                    displayEmpty
-                    sx={{ height: "36px" }}
-                    inputProps={{ "aria-label": "Without label" }}
-                  >
-                    <MenuItem value="" disabled>
-                      Select Subject
-                    </MenuItem>
-                    {subjects?.data?.map((subject) => (
-                      <MenuItem key={subject._id} value={subject._id}>
-                        {subject.subject_name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Controller
-              rules={{ required: "Questions is required" }}
-              name="questionList"
-              control={control}
-              render={({ field }) => (
-                <Autocomplete
-                  multiple
-                  disabled={QustionsList.length === 0}
-                  options={QustionsList || []}
-                  getOptionLabel={(option) => option.question || ""}
-                  value={field.value || []}
-                  onChange={(_, newValue) => {
-                    const uniqueQuestions = newValue.filter(
-                      (item, index, self) =>
-                        index === self.findIndex((t) => t._id === item._id)
-                    );
-                    field.onChange(uniqueQuestions);
+    <div className="page-body">
+      <div className="container-fluid">
+        <Box
+          sx={{
+            maxWidth: 800,
+            mx: "auto",
+            mt: 4,
+            p: 3,
+          }}
+        >
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Typography variant="h6">Quiz Form</Typography>
+              </Grid>
+              <Grid item xs={12}>
+                <Controller
+                  name="name"
+                  control={control}
+                  rules={{
+                    required: "Name is required",
+                    minLength: {
+                      value: 5,
+                      message: "Name must be at least 5 characters long",
+                    },
                   }}
-                  renderInput={(params) => (
+                  render={({ field }) => (
                     <TextField
-                      {...params}
-                      label="Questions"
+                      {...field}
+                      label="Name"
                       variant="outlined"
                       size="small"
-                      error={!!errors.questionList}
+                      fullWidth
+                      error={!!errors.name}
+                      helperText={errors.name ? errors.name.message : ""}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Controller
+                  name="description"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Description"
+                      variant="outlined"
+                      size="small"
+                      fullWidth
+                      multiline
+                      rows={4}
+                      error={!!errors.description}
                       helperText={
-                        errors.questionList ? errors.questionList.message : ""
+                        errors.description ? errors.description.message : ""
                       }
                     />
                   )}
                 />
-              )}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Controller
-              name="totalMarks"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Total Marks"
-                  variant="outlined"
-                  size="small"
-                  type="number"
-                  fullWidth
-                  disabled
-                  error={!!errors.totalMarks}
-                  helperText={
-                    errors.totalMarks ? errors.totalMarks.message : ""
-                  }
+              </Grid>
+              <Grid item xs={12}>
+                <Controller
+                  rules={{ required: "Subject is required" }}
+                  name="subject"
+                  control={control}
+                  render={({ field }) => (
+                    <FormControl fullWidth margin="dense" size="small">
+                      <InputLabel shrink>Subject</InputLabel>
+                      <Select
+                        {...field}
+                        label="Subject"
+                        displayEmpty
+                        sx={{ height: "36px" }}
+                        inputProps={{ "aria-label": "Without label" }}
+                      >
+                        <MenuItem value="" disabled>
+                          Select Subject
+                        </MenuItem>
+                        {subjects?.data?.map((subject) => (
+                          <MenuItem key={subject._id} value={subject._id}>
+                            {subject.subject_name}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
                 />
-              )}
-            />
-          </Grid>
-          {/* <Grid item xs={12} sm={4}>
+              </Grid>
+              <Grid item xs={12}>
+                <Controller
+                  rules={{ required: "Questions is required" }}
+                  name="questionList"
+                  control={control}
+                  render={({ field }) => (
+                    <Autocomplete
+                      multiple
+                      disabled={QustionsList.length === 0}
+                      options={QustionsList || []}
+                      getOptionLabel={(option) => option.question || ""}
+                      value={field.value || []}
+                      onChange={(_, newValue) => {
+                        const uniqueQuestions = newValue.filter(
+                          (item, index, self) =>
+                            index === self.findIndex((t) => t._id === item._id)
+                        );
+                        field.onChange(uniqueQuestions);
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Questions"
+                          variant="outlined"
+                          size="small"
+                          error={!!errors.questionList}
+                          helperText={
+                            errors.questionList
+                              ? errors.questionList.message
+                              : ""
+                          }
+                        />
+                      )}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Controller
+                  name="totalMarks"
+                  control={control}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      label="Total Marks"
+                      variant="outlined"
+                      size="small"
+                      type="number"
+                      fullWidth
+                      disabled
+                      error={!!errors.totalMarks}
+                      helperText={
+                        errors.totalMarks ? errors.totalMarks.message : ""
+                      }
+                    />
+                  )}
+                />
+              </Grid>
+              {/* <Grid item xs={12} sm={4}>
             <Controller
               name="passingMarks"
               control={control}
@@ -311,7 +318,7 @@ const QuizForm = ({  Isedit = false }) => {
               )}
             />
           </Grid> */}
-          {/* <Grid item xs={12} sm={4}>
+              {/* <Grid item xs={12} sm={4}>
             <Controller
               name="negativeMarks"
               control={control}
@@ -331,26 +338,40 @@ const QuizForm = ({  Isedit = false }) => {
               )}
             />
           </Grid> */}
-          <Grid item xs={12}>
-            <Controller
-              name="isPublished"
-              control={control}
-              render={({ field }) => (
-                <FormControlLabel
-                  control={<Checkbox {...field} checked={field.value} />}
-                  label="Published"
+              <Grid item xs={6}>
+                <Controller
+                  name="isPublished"
+                  control={control}
+                  render={({ field }) => (
+                    <FormControlLabel
+                      control={<Checkbox {...field} checked={field.value} />}
+                      label="Published"
+                    />
+                  )}
                 />
-              )}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Button type="submit" variant="contained" color="primary">
-              {Isedit ? "Update" : "Submit"}
-            </Button>
-          </Grid>
-        </Grid>
-      </form>
-    </Box>
+              </Grid>
+              <Grid item xs={6}>
+                <Controller
+                  name="isFeatured"
+                  control={control}
+                  render={({ field }) => (
+                    <FormControlLabel
+                      control={<Checkbox {...field} checked={field.value} />}
+                      label="Feature (show in home page)"
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <Button type="submit" variant="contained" color="primary">
+                  {Isedit ? "Update" : "Submit"}
+                </Button>
+              </Grid>
+            </Grid>
+          </form>
+        </Box>
+      </div>
+    </div>
   );
 };
 

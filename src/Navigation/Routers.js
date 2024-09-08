@@ -164,6 +164,10 @@ function AppRoutes() {
             element={<ReviewsListing />}
           />
           <Route
+            path={`${process.env.PUBLIC_URL}/editreview/:reviewID`}
+            element={<ReviewsListing edit />}
+          />
+          <Route
             path={`${process.env.PUBLIC_URL}/addnewquestions/`}
             element={<AddQuestions />}
           />

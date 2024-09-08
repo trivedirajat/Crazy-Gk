@@ -1,95 +1,97 @@
-import React, { useEffect, useState } from "react";
-import Header from "../../component/Header";
-import SideBar from "../../component/SideNav";
-import Footer from "../../component/Footer";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { addReviews, getreviewStatus,selectedreviewWithId } from "../../redux/Slices/ReviewsSlice";
+import React, { useState, useEffect } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { TextField, Button, Box, Typography, Rating } from "@mui/material";
 
-const ReviewsListing = () => {
-  const location = useLocation()
-  const { id } = location.state || {}
-  console.log("id",id)
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  useAddReviewMutation,
+  useEditReviewMutation,
+  useGetReviewByIdQuery,
+} from "../../redux/apis/reviewapis";
+import toast from "react-hot-toast";
+const ReviewForm = ({ edit = false }) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const { reviewID } = useParams();
+  const {
+    control,
+    handleSubmit,
+    register,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm();
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [preview, setPreview] = useState(null);
 
-  const status = useSelector(getreviewStatus)
-  const selectedReview = useSelector(state => selectedreviewWithId(state, id !== undefined ? id : 0))
-  const [reviewData, setReviewData] = useState({
-    review: '',
-    // user_name: '',
-    rating: ''
-  })
-  const navigatpage = async (navname) => {
-    console.log("navigatpage -> navname", navname);
-    navigate(navname);
+  // Fetch review data if edit mode
+  const { data: existingReview, isSuccess: isReviewLoaded } =
+    useGetReviewByIdQuery(reviewID, { skip: !edit });
+
+  // RTK mutations
+  const [createReview] = useAddReviewMutation();
+  const [updateReview] = useEditReviewMutation();
+
+  useEffect(() => {
+    if (isReviewLoaded && edit) {
+      const { name, review, rating } = existingReview?.data;
+      setValue("name", name);
+      setValue("review", review);
+      setValue("rating", rating);
+      setPreview(existingReview?.data?.user_profile || null);
+    }
+  }, [isReviewLoaded, existingReview, edit, setValue]);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedImage(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
 
-  useEffect(() => {
-    if (status === 'addSucceeded') {
-      navigatpage('/review')
+  const onSubmit = async (data) => {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("review", data.review);
+    formData.append("rating", data.rating);
+    if (selectedImage) {
+      formData.append("user_profile", selectedImage);
     }
 
-    return () => {
+    try {
+      if (edit) {
+        // Update review if in edit mode
+        const response = await updateReview({
+          id: reviewID,
+          reviewData: formData,
+        }).unwrap();
+        if (response?.status === 200) {
+          toast.success("Review updated successfully");
+          navigate("/review");
+        } else {
+          toast.error("Failed to update review");
+        }
+      } else {
+        // Create new review if in create mode
+        const response = await createReview(formData).unwrap();
+        if (response?.status === 201) {
+          toast.success("Review created successfully");
+          navigate("/review");
+        } else {
+          toast.error("Failed to create review");
+        }
+      }
 
+      reset();
+      setPreview(null);
+      setSelectedImage(null);
+    } catch (error) {
+      console.error("Error submitting review", error);
+      toast.error(`Failed to ${edit ? "update" : "create"} review`);
     }
-  }, [status])
-  useEffect(() => {
-    if (id !== undefined) {
-      setReviewData({
-        review: selectedReview[0]?.review ?? '',
-        rating: selectedReview[0]?.rating ?? '',
-        // // user_name: selectedReview[0]?.user_name ?? ''
-      })
-    }
-
-    return () => {
-
-    }
-  }, [id])
-
-
-
-  // const handleValueChange = (event) => {
-  //   const { name, value, type } = event.target;
-
-  //   if (type === 'file') {
-  //     const file = event.target.files[0];
-
-  //     setReviewData(prevState => ({
-  //       ...prevState,
-  //       [name]: file
-  //     }));
-  //   } else {
-  //     setReviewData(prevState => ({
-  //       ...prevState,
-  //       [name]: value
-  //     }));
-  //   }
-  // }
-  const handleValueChange = (event) => {
-    const { name, value } = event.target;
-  
-    setReviewData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
-  }
-  // const addReview = (e) => {
-  //   e.preventDefault()
-  //   const formData = new FormData()
-  //   // formData.append('user_name', reviewData.user_name)
-  //   formData.append('rating', reviewData.rating)
-  //   formData.append('review', reviewData.review)
-  //   dispatch(addReviews(formData))
-  // }
-  const addReview = (e) => {
-    e.preventDefault()
-    dispatch(addReviews({
-      rating: reviewData.rating ?? '',
-      review: reviewData.review ?? ''
-    }))
-  }
+  };
 
   return (
     <div className="page-body">
@@ -108,7 +110,7 @@ const ReviewsListing = () => {
                   <li
                     className="breadcrumb-item"
                     onClick={() => {
-                      navigatpage("/review");
+                      navigate("/review");
                     }}
                   >
                     Reviews Listing
@@ -125,73 +127,96 @@ const ReviewsListing = () => {
           <div className="col-sm-12 ">
             <div className="card">
               <div className="card-header">
-                <h5>Add New Reviews</h5>
+                <h5> {edit ? "Edit Your Review" : "Submit Your Review"}</h5>
               </div>
-              <form className="form theme-form">
-                <div className="card-body">
-                {/*  <div className="row ">
-                    <div className="col-md-8 ">
-                      <div className="form-group">
-                        <label htmlFor="exampleFormControlFirstName">
-                          Image
-                        </label>
-                        <input
-                          className="form-control"
-                          id="exampleFormControlFirstName"
-                          type="file"
-                          placeholder="Image"
-                          name="image"
-                          onChange={(e) => handleValueChange(e)}
-                        />
-                      </div>
-                    </div>
-                  </div>*/}
-                  <div className="row ">
-                    <div className="col-md-8 ">
-                      <div className="form-group">
-                        <label htmlFor="exampleFormControlFirstName">
-                        Reviews
-                        </label>
-                        <input
-                          className="form-control"
-                          id="exampleFormControlFirstName"
-                          type="text"
-                          placeholder="Title"
-                          name="review"
-                          value={reviewData?.review}
-                          onChange={(e) => handleValueChange(e)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row">
-                    <div className="col-md-8">
-                      <div className="form-group">
-                        <label htmlFor="exampleFormControlLastName">
-                        Rating
-                        </label>
-                        <input
-                          className="form-control"
-                          id="exampleFormControlLastName"
-                          type="text"
-                          placeholder="rating"
-                          name="rating"
-                          value={reviewData?.rating}
-                          onChange={(e) => handleValueChange(e)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="col-md-12 ">
-                    <div className="card-footer float-right">
-                      <button className="btn btn-color" type="submit" onClick={(e) => { addReview(e) }}>
-                        Add
-                      </button>
-                    </div>
-                  </div>
-                </div>
+              <form
+                className="form theme-form"
+                onSubmit={handleSubmit(onSubmit)}
+                style={{ padding: "20px" }}
+              >
+                {/* Name Field */}
+                <TextField
+                  {...register("name", { required: "Name is required" })}
+                  label="Name"
+                  fullWidth
+                  margin="normal"
+                  error={!!errors.name}
+                  helperText={errors.name ? errors.name.message : ""}
+                />
+
+                {/* Review (Description) Field */}
+                <TextField
+                  {...register("review", {
+                    required: "Review is required",
+                  })}
+                  label="Review"
+                  fullWidth
+                  multiline
+                  rows={4}
+                  margin="normal"
+                  error={!!errors.review}
+                  helperText={errors.review ? errors.review.message : ""}
+                />
+
+                {/* Rating (Star Rating) */}
+                <Box sx={{ marginBottom: 2 }}>
+                  <Typography component="legend">Rating</Typography>
+                  <Controller
+                    name="rating"
+                    control={control}
+                    defaultValue={2}
+                    rules={{ required: "Rating is required" }}
+                    render={({ field }) => (
+                      <Rating
+                        {...field}
+                        precision={1}
+                        value={Number(field.value)}
+                        onChange={(_, value) => field.onChange(value)}
+                      />
+                    )}
+                  />
+                  {errors.rating && (
+                    <Typography color="error">
+                      {errors.rating.message}
+                    </Typography>
+                  )}
+                </Box>
+
+                {/* Image Upload (user_profile) */}
+                <Box
+                  sx={{
+                    marginBottom: 2,
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box>
+                    <Typography component="legend">
+                      Upload Profile Image
+                    </Typography>
+                    <input
+                      accept="image/*"
+                      type="file"
+                      {...register("user_profile")}
+                      onChange={handleImageChange}
+                    />
+                  </Box>
+                  {preview && (
+                    <Box mt={2}>
+                      <img
+                        src={preview}
+                        alt="Profile Preview"
+                        width="200"
+                        style={{ borderRadius: "7px" }}
+                      />
+                    </Box>
+                  )}
+                </Box>
+
+                {/* Submit Button */}
+                <Button type="submit" variant="contained" color="primary">
+                  {edit ? "Update Review" : "Submit Review"}
+                </Button>
               </form>
             </div>
           </div>
@@ -200,4 +225,4 @@ const ReviewsListing = () => {
     </div>
   );
 };
-export default ReviewsListing;
+export default ReviewForm;
