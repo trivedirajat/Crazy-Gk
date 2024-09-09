@@ -224,29 +224,19 @@ const AddStudysMaterial = () => {
                       </div>
                     </div>
                   </div> */}
-                  <div
-                    className="row"
-                    style={{ width: "100%", height: "100%" }}
-                  >
-                    <div style={{ width: "100%", height: "50%" }}>
-                      {/* Old editor */}
-                      {/* <JoditEditor
-                        ref={editor}
-                        value={content}
-                        config={config}
-                        tabIndex={1} // tabIndex of textarea
-                        onBlur={newContent => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
-                        onChange={newContent => setContent(newContent)}
-                      /> */}
-
-                      {/* New Editor */}
-                      <QuillTextEditor
-                        ref={editor}
-                        value={content}
-                        setContent={(newContent) => setContent(newContent)}
-                      />
-
-                      {/* {content} */}
+                  <div className="row">
+                    <div className="col-md-8">
+                      <div className="form-group">
+                        <label htmlFor="exampleFormControlLastName">
+                          Description
+                        </label>
+                        <QuillTextEditor
+                          id="exampleFormControlLastName"
+                          value={content}
+                          setContent={(newContent) => setContent(newContent)}
+                          style={{ padding: "0" }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
