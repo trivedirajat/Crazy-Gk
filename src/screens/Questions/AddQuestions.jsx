@@ -76,7 +76,19 @@ function AddQuestions() {
     setValue(`questions.${qIndex}.options`, updatedOptions);
   };
 
+  const validateQuestions = (questions) => {
+    return questions.every((question) => {
+      if (question.questionType === "Fill in the Blank") return true;
+      return question.options.some((option) => option.isCorrect);
+    });
+  };
+
   const onSubmit = async (data) => {
+    if (!validateQuestions(data.questions)) {
+      toast.error("Each question must have at least one correct option.");
+      return;
+    }
+
     const response = addQuestions(data);
     navigatpage(`/Questions`);
     toast.promise(response, {

@@ -14,4 +14,18 @@ function App() {
   );
 }
 
+// export default App;
+// import React from "react";
+// import DefaultRouters from "./Navigation/Routers";
+// import { Toaster } from "react-hot-toast";
+
+// function App() {
+//   return (
+//     <>
+//       <Toaster />
+//       <DefaultRouters />
+//     </>
+//   );
+// }
+
 export default App;
