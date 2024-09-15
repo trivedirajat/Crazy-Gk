@@ -71,12 +71,20 @@ const SubjectsListing = () => {
   //   }
   // }
   const handleValueChange = (event) => {
-    const { name, value } = event.target;
+    const { name, value, files } = event.target;
 
-    setSubjectData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+    // Check if the input is a file input
+    if (name === "image") {
+      setSubjectData((prevState) => ({
+        ...prevState,
+        [name]: files[0],
+      }));
+    } else {
+      setSubjectData((prevState) => ({
+        ...prevState,
+        [name]: value,
+      }));
+    }
   };
   const addSubject = (e) => {
     e.preventDefault();
