@@ -40,6 +40,7 @@ import { useSelector } from "react-redux";
 import { selectValidate } from "../redux/Slices/AuthSlice";
 import AllQuestions from "screens/Questions/AllQuestions";
 import EditQuestion from "screens/Questions/EditQuestion";
+import UserTable from "screens/Users/UserTable";
 
 function AppRoutes() {
   return (
@@ -188,6 +189,10 @@ function AppRoutes() {
             path={`${process.env.PUBLIC_URL}/editQuiz/:Quizid`}
             element={<AddQuiz Isedit />}
           />
+          <Route
+            path={`${process.env.PUBLIC_URL}/users`}
+            element={<UserTable />}
+          />
         </Routes>
         <Footer />
       </div>
@@ -208,8 +213,6 @@ function Routers() {
   );
 }
 export default Routers;
-
-
 
 // import React from "react";
 // import {

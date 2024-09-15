@@ -11,6 +11,7 @@ import {
   BookOpen,
   Briefcase,
   PenTool,
+  Users,
 } from "react-feather";
 
 export const MENUITEMS = [
@@ -21,6 +22,13 @@ export const MENUITEMS = [
     type: "link",
     badgeType: "primary",
     active: false,
+  },
+  {
+    title: "Users",
+    icon: Users,
+    type: "link",
+    active: false,
+    path: "/users",
   },
   // {
   //     title: 'Users', icon: User, type: 'sub', active: false, children: [

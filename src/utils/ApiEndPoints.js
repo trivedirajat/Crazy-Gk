@@ -55,4 +55,9 @@ export const apiEndPoints = {
   addQuiz: "/quiz/addQuiz",
   editQuiz: "/quiz/updateQuiz",
   deleteQuiz: "/quiz/deleteQuiz",
+  //user
+  addUser: "/user/addUser",
+  getUser: "/users/getAllUsers",
+  editUser: "/users/editUser",
+  deleteUser: "/users/deleteUser",
 };
