@@ -1,171 +1,172 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Box, Button, Card, IconButton, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import CustomDialog from "../../component/common/CustomDialog";
+import { IconPencil, IconTrash } from "@tabler/icons-react";
+import toast from "react-hot-toast";
+
+import ConfirmDialog from "../../component/common/CustomDialog";
 import {
   useDeleteReviewMutation,
   useGetReviewsQuery,
 } from "../../redux/apis/reviewapis";
-import { Link, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  Typography,
-} from "@mui/material";
+import Breadcrumbs from "component/common/Breadcrumbs";
 
 const ReviewsDataGrid = () => {
   const navigate = useNavigate();
   const [paginationModel, setPaginationModel] = useState({
-    page: 1,
+    page: 0,
     pageSize: 10,
   });
-  const [deleteReview] = useDeleteReviewMutation();
-  const [dialog, setDialog] = useState({
-    open: false,
-    id: "",
+  const [selectedId, setSelectedId] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const { data: reviewsData, isLoading } = useGetReviewsQuery({
+    page: paginationModel.page,
+    pageSize: paginationModel.pageSize,
   });
 
-  const {
-    data: reviews,
-    isLoading,
-    isError,
-  } = useGetReviewsQuery(
-    { page: paginationModel.page, limit: paginationModel.pageSize },
-    {
-      refetchOnMountOrArgChange: true,
-    }
-  );
-
-  if (isError) {
-    toast.error("Could not fetch reviews. Try again");
-    console.error("Error fetching reviews:", isError);
-  }
-
-  const handleConformDelete = async () => {
-    try {
-      await deleteReview(dialog.id).unwrap();
-      toast.success("Review deleted successfully");
-    } catch (error) {
-      toast.error("Could not delete. Try again");
-    }
-    setDialog({ open: false, id: "" });
-  };
+  const [deleteReview] = useDeleteReviewMutation();
 
   const handleEdit = (id) => {
     navigate(`/editreview/${id}`);
   };
 
+  const handleDelete = async () => {
+    if (selectedId) {
+      try {
+        await deleteReview(selectedId).unwrap();
+        toast.success("Review deleted successfully");
+        setOpenDialog(false);
+      } catch (error) {
+        toast.error("Failed to delete the review");
+      }
+    }
+  };
+
+  const openDeleteConfirmation = (id) => {
+    setSelectedId(id);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedId(null);
+  };
+
   const columns = [
-    { field: "name", headerName: "Name", flex: 0.1 },
-    { field: "review", headerName: "Review", flex: 0.7 },
-    { field: "rating", headerName: "Rating", flex: 0.1 },
+    {
+      field: "name",
+      headerName: "Name",
+      flex: 1,
+      renderCell: ({ row }) => (
+        <Typography sx={{ color: "text.secondary" }}>
+          {row.name || "-"}
+        </Typography>
+      ),
+    },
+    {
+      field: "review",
+      headerName: "Review",
+      flex: 2,
+      renderCell: ({ row }) => (
+        <Typography sx={{ color: "text.secondary" }}>
+          {row.review || "-"}
+        </Typography>
+      ),
+    },
+    {
+      field: "rating",
+      headerName: "Rating",
+      flex: 0.5,
+      renderCell: ({ row }) => (
+        <Typography sx={{ color: "text.secondary" }}>
+          {row.rating || "-"}
+        </Typography>
+      ),
+    },
     {
       field: "actions",
       headerName: "Actions",
-      flex: 0.1,
-      width: 150,
+      flex: 1,
       renderCell: (params) => (
-        <div>
-          <i
-            className="fa fa-edit theme-fa-icon mr-3"
-            aria-hidden="true"
-            title="Edit Review"
+        <>
+          <IconButton
+            color="primary"
             onClick={() => handleEdit(params.row._id)}
-          ></i>
-          <i
-            className="fa fa-trash theme-fa-icon"
-            aria-hidden="true"
-            title="Delete Review"
-            onClick={() => setDialog({ open: true, id: params.row._id })}
-          ></i>
-        </div>
+          >
+            <IconPencil />
+          </IconButton>
+          <IconButton
+            color="error"
+            onClick={() => openDeleteConfirmation(params.row._id)}
+          >
+            <IconTrash />
+          </IconButton>
+        </>
       ),
     },
   ];
 
-  return (
-    <div className="page-body">
-      <div className="container-fluid">
-        <div className="page-header">
-          <div className="row">
-            <div className="col">
-              <div className="page-header-left">
-                <Typography variant="h3">All Reviews</Typography>
-                <ol className="breadcrumb">
-                  <li className="breadcrumb-item">
-                    <Link to="/">
-                      <i
-                        className="fa fa-home theme-fa-icon"
-                        aria-hidden="true"
-                      ></i>
-                    </Link>
-                  </li>
-                  <li className="breadcrumb-item active">
-                    All Reviews Listing
-                  </li>
-                </ol>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-sm-12 col-xl-12">
-            <div className="row pt-3">
-              <div className="col-md-6">
-                <div className="form-group">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => navigate("/addreview")}
-                  >
-                    Add New Review
-                  </Button>
-                </div>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-sm-12 col-xl-12">
-                <Card>
-                  <CardHeader title="List of Reviews:" />
-                  <CardContent>
-                    <div style={{ height: 400, width: "100%" }}>
-                      <DataGrid
-                        rows={reviews?.reviews || []}
-                        columns={columns}
-                        rowCount={reviews?.total || 0} // Ensure this reflects the total rows
-                        pagination
-                        paginationMode="server"
-                        disableRowSelectionOnClick
-                        paginationModel={paginationModel}
-                        pageSizeOptions={[10, 25, 50, 100]}
-                        onPaginationModelChange={setPaginationModel}
-                        loading={isLoading}
-                        getRowId={(row) => row._id}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+  const breadcrumbItems = [
+    { label: "Dashboard", link: "/dashboard" },
+    { label: "Reviews" },
+  ];
 
-      <CustomDialog
-        open={dialog.open}
-        title="Are you sure you want to delete this review?"
-        onClose={() => setDialog({ open: false, id: "" })}
-        onConfirm={handleConformDelete}
-        confirmText="Confirm"
-        cancelText="Cancel"
-        cancelButtonColor="error"
-        content=""
+  return (
+    <Box className="page-body" sx={{ padding: 2 }}>
+      <Breadcrumbs items={breadcrumbItems} />
+
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => navigate("/addreview")}
+      >
+        Add New Review
+      </Button>
+
+      <Box sx={{ width: "100%", marginTop: 3 }}>
+        <Card>
+          <DataGrid
+            autoHeight
+            rows={reviewsData?.data || []}
+            getRowId={(row) => row._id}
+            columns={columns}
+            disableRowSelectionOnClick
+            loading={isLoading}
+            pagination
+            paginationMode="server"
+            rowCount={reviewsData?.total_data || 0}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            pageSizeOptions={[10, 25, 50, 100]}
+            localeText={{ noRowsLabel: "No Record(s) Found" }}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                color: "#000",
+                fontWeight: "bold",
+                fontSize: "16px",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                borderBottom: "2px solid #04aa50",
+              },
+              "& .MuiDataGrid-cell": {
+                display: "flex",
+                alignItems: "center",
+              },
+            }}
+          />
+        </Card>
+      </Box>
+
+      <ConfirmDialog
+        open={openDialog}
+        title="Remove Review"
+        content="Are you sure you want to remove this review?"
+        onClose={handleCloseDialog}
+        onConfirm={handleDelete}
       />
-    </div>
+    </Box>
   );
 };
 

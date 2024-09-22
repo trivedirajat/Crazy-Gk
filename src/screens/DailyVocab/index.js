@@ -1,238 +1,173 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Box, Button, Card, IconButton, Typography } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
+import { IconPencil, IconTrash } from "@tabler/icons-react";
+import toast from "react-hot-toast";
+import ConfirmDialog from "component/common/ConfirmDialog";
 import {
-  deleteDailyVocabs,
-  fetchDailyVocabs,
-  getDailyVocabsError,
-  getDailyVocabsStatus,
-  selectAllDailyVocabs,
-} from "../../redux/Slices/DailyVocabSlice";
+  useGetDailyVocabQuery,
+  useDeleteDailyVocabMutation,
+} from "../../redux/apis/dailyvocabapis";
 import { stripHtmlTags } from "utils/stripHtmlTags";
+import Breadcrumbs from "component/common/Breadcrumbs";
 
 const DailyVocab = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const allDailyVocab = useSelector(selectAllDailyVocabs);
-  console.log("allDailyVocab", allDailyVocab);
-  const status = useSelector(getDailyVocabsStatus);
-  const error = useSelector(getDailyVocabsError);
-  const [selectedId, setSelectedId] = useState("");
-  const navigatpage = async (navname) => {
-    console.log("navigatpage -> navname", navname);
-    navigate(navname);
-  };
+  const [selectedId, setSelectedId] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  });
 
-  useEffect(() => {
-    dispatch(
-      fetchDailyVocabs({
-        limit: 200,
-        offset: 0,
-      })
-    );
-  }, [navigate]);
-  useEffect(() => {
-    if (status === "deleteSucceeded") {
-      dispatch(
-        fetchDailyVocabs({
-          limit: 200,
-          offset: 0,
-        })
-      );
-    } else {
+  const { data: dailyVocabData, isLoading } = useGetDailyVocabQuery(
+    {
+      offset: paginationModel.page,
+      limit: paginationModel.pageSize,
+    },
+    {
+      refetchOnMountOrArgChange: true,
+      refetchOnReconnect: true,
+      refetchOnFocus: true,
     }
-  }, [status, error]);
+  );
 
-  const deleteDailyVocab = (e, id) => {
-    dispatch(
-      deleteDailyVocabs({
-        dalyVocab_id: id,
-      })
-    );
-    setSelectedId("");
+  const [deleteDailyVocab] = useDeleteDailyVocabMutation();
+
+  const handleEdit = (id) => {
+    navigate(`/editDailyVocab/${id}`);
   };
 
-  return (
-    <div className="page-body">
-      {/* Model_start */}
-      <div
-        class="modal fade"
-        id="exampleModal"
-        tabindex="-1"
-        role="dialog"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">
-                Delete Daily Vocab
-              </h5>
-              <button
-                class="close"
-                type="button"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">×</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p className="text-center">
-                <h6>Are You Sure ?</h6>
-              </p>
-              <p className="text-center">
-                <h6>Delete This Daily Vocab</h6>
-              </p>
-            </div>
-            <div class="modal-footer justify-content-center">
-              <button
-                class="btn btn-success mr-5"
-                type="button"
-                data-dismiss="modal"
-                onClick={(e) => deleteDailyVocab(e, selectedId)}
-              >
-                Yes
-              </button>
-              <button
-                class="btn btn-primary"
-                type="button"
-                data-dismiss="modal"
-              >
-                No
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* Model_end */}
+  const handleDelete = async () => {
+    if (selectedId) {
+      try {
+        await deleteDailyVocab(selectedId).unwrap();
+        toast.success("Daily vocab deleted successfully");
+        setOpenDialog(false);
+      } catch (error) {
+        toast.error("Failed to delete the daily vocab");
+      }
+    }
+  };
 
-      <div class="container-fluid">
-        <div class="page-header">
-          <div class="row">
-            <div class="col">
-              <div class="page-header-left">
-                <h3>All Daily Vocab</h3>
-                <ol class="breadcrumb">
-                  <li class="breadcrumb-item">
-                    <a href="index.html">
-                      {/* <i data-feather="home"></i> */}
-                      <i
-                        class="fa fa-home theme-fa-icon"
-                        aria-hidden="true"
-                      ></i>
-                    </a>
-                  </li>
-                  {/* <li class="breadcrumb-item">Add New User</li>
-                                            <li class="breadcrumb-item">Form Layout</li> */}
-                  <li class="breadcrumb-item active">
-                    All Daily Vocab Listing
-                  </li>
-                </ol>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="container-fluid">
-        <div class="row">
-          <div class="col-sm-12 col-xl-12">
-            <div className="row pt-3">
-              <div className="col-md-6">
-                <div class="form-group">
-                  <button
-                    class="btn btn-color"
-                    onClick={() => navigatpage("/adddailyvocab")}
-                  >
-                    Add Daily Vocab
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-sm-12 col-xl-12">
-                <div class="card">
-                  <div class="card-header">
-                    <h5>List of Daily Vocab:</h5>
-                  </div>
-                  <div class="table-responsive">
-                    <table class="table table-border-horizontal">
-                      <thead>
-                        <tr className="text-center">
-                          <th scope="col">Title</th>
-                          <th scope="col">Description</th>
-                          <th scope="col">Action</th>
-                          <th scope="col"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {allDailyVocab &&
-                          allDailyVocab?.map((item) => (
-                            <tr className="text-center">
-                              <td>{item?.title}</td>
-                              <td>{stripHtmlTags(item?.description || "")}</td>
-                              <td>
-                                <i
-                                  class="fa fa-edit theme-fa-icon mr-3"
-                                  aria-hidden="true"
-                                  title="Edit Daily Vocab"
-                                  onClick={() => {
-                                    navigate(`/adddailyvocab`, {
-                                      state: { id: item?._id },
-                                    });
-                                  }}
-                                ></i>
-                                <i
-                                  class="fa fa-trash theme-fa-icon"
-                                  aria-hidden="true"
-                                  title="Delete Daily Vocab"
-                                  data-toggle="modal"
-                                  data-original-title="test"
-                                  data-target="#exampleModal"
-                                  onClick={() => setSelectedId(item._id)}
-                                ></i>
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div class="col-12  ">
-                      <div class="card ">
-                        <div class="card-body ">
-                          <nav aria-label="Page navigation example ">
-                            <ul class="pagination pagination-primary float-right">
-                              <li class="page-item">
-                                <a class="page-link">Previous</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">1</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">2</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">3</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">Next</a>
-                              </li>
-                            </ul>
-                          </nav>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  const openDeleteConfirmation = (id) => {
+    setSelectedId(id);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedId(null);
+  };
+
+  const columns = [
+    {
+      field: "title",
+      headerName: "Title",
+      flex: 1,
+      renderCell: ({ row }) => (
+        <Typography sx={{ color: "text.secondary" }}>
+          {row.title || "-"}
+        </Typography>
+      ),
+    },
+    {
+      field: "description",
+      headerName: "Description",
+      flex: 2,
+      renderCell: ({ row }) => (
+        <Typography sx={{ color: "text.secondary" }}>
+          {stripHtmlTags(row.description) || "-"}
+        </Typography>
+      ),
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 1,
+      renderCell: (params) => (
+        <>
+          <IconButton color="primary" onClick={() => handleEdit(params.row.id)}>
+            <IconPencil />
+          </IconButton>
+          <IconButton
+            color="error"
+            onClick={() => openDeleteConfirmation(params.row.id)}
+          >
+            <IconTrash />
+          </IconButton>
+        </>
+      ),
+    },
+  ];
+
+  const rows =
+    dailyVocabData?.data.map((vocab) => ({
+      id: vocab._id,
+      title: vocab.title,
+      description: vocab.description,
+    })) || [];
+
+  const breadcrumbItems = [
+    { label: "Dashboard", link: "/dashboard" },
+    { label: "Daily Vocab" },
+  ];
+  return (
+    <Box className="page-body" sx={{ padding: 2 }}>
+      <Breadcrumbs items={breadcrumbItems} />
+      {/* <Typography variant="h4">All Daily Vocab</Typography> */}
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => navigate("/adddailyvocab")}
+        sx={{ marginBottom: 2 }}
+      >
+        Add Daily Vocab
+      </Button>
+
+      <Box sx={{ width: "100%" }}>
+        <Card>
+          <DataGrid
+            autoHeight
+            rows={rows}
+            columns={columns}
+            disableRowSelectionOnClick
+            loading={isLoading}
+            pagination
+            paginationMode="server"
+            rowCount={dailyVocabData?.total_data || 0}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            pageSizeOptions={[10, 25, 50, 100]}
+            localeText={{ noRowsLabel: "No Record(s) Found" }}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                color: "#000",
+                fontWeight: "bold",
+                fontSize: "16px",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                borderBottom: "2px solid #04aa50",
+              },
+              "& .MuiDataGrid-cell": {
+                display: "flex",
+                alignItems: "center",
+              },
+            }}
+          />
+        </Card>
+      </Box>
+
+      <ConfirmDialog
+        open={openDialog}
+        title="Remove Daily Vocab"
+        content="Are you sure you want to remove this daily vocab?"
+        onClose={handleCloseDialog}
+        onConfirm={handleDelete}
+      />
+    </Box>
   );
 };
+
 export default DailyVocab;

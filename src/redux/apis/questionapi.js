@@ -8,13 +8,22 @@ const Questionapi = createApi({
   tagTypes: ["Questions", "GetQuestions"],
   endpoints: (builder) => ({
     getQuestions: builder.query({
-      query: ({ id = "" }) => ({
-        url: `${apiEndPoints.getQustions}/${id}`,
+      query: ({ page = 0, pageSize = 10 }) => ({
+        url: `${apiEndPoints.getQustions}`,
         method: "GET",
+        params: {
+          offset: page,
+          limit: pageSize,
+        },
       }),
       providesTags: ["GetQuestions"],
     }),
-
+    getquestionsbyid: builder.query({
+      query: ({ id }) => ({
+        url: `${apiEndPoints.getQustions}/${id}`,
+        method: "GET",
+      }),
+    }),
     AddQuestions: builder.mutation({
       query: (data) => ({
         url: apiEndPoints.addQuestion,
@@ -45,6 +54,7 @@ const Questionapi = createApi({
 export default Questionapi;
 export const {
   useGetQuestionsQuery,
+  useGetquestionsbyidQuery,
   useAddQuestionsMutation,
   useEditQuestionsMutation,
   useDeleteQuestionsMutation,

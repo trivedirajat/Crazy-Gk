@@ -1,7 +1,4 @@
 import React from "react";
-import Header from "../../component/Header";
-import SideBar from "../../component/SideNav";
-import Footer from "../../component/Footer";
 import { useNavigate } from "react-router-dom";
 
 const UserListing = () => {

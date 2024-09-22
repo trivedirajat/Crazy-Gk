@@ -98,7 +98,10 @@ const QuillTextEditor = forwardRef(
     return (
       <ReactQuill
         ref={ref}
-        style={{ maxHeight: "500px", width: "100%", ...style }}
+        style={{
+          width: "100%",
+          ...style,
+        }}
         theme="snow"
         value={value}
         onChange={(value) => setContent(value)}

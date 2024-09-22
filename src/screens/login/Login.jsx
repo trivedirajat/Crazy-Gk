@@ -1,68 +1,83 @@
-// src/LoginPage.jsx
 import React from "react";
-import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Container,
-  Paper,
-} from "@mui/material";
-import styled from "@emotion/styled";
+import { Grid, Box, Card, Stack, Typography } from "@mui/material";
 
-const StyledPaper = styled(Paper)`
-  padding: 2rem;
-  margin: 2rem auto;
-  max-width: 400px;
-  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
-`;
+// components
+import Logo from "../../assets/gktricks/gktricks.jpg";
+import AuthLogin from "./AuthLogin";
 
-const FormWrapper = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const StyledButton = styled(Button)`
-  margin-top: 1.5rem;
-  background-color: #1976d2;
-  color: white;
-
-  &:hover {
-    background-color: #155a9e;
-  }
-`;
-
-const LoginPage = () => {
+const Login = () => {
   return (
-    <Container>
-      <StyledPaper elevation={3}>
-        <Typography variant="h4" component="h1" align="center" gutterBottom>
-          Login
-        </Typography>
-        <FormWrapper>
-          <TextField
-            label="Email"
-            variant="outlined"
-            margin="normal"
-            fullWidth
-            required
-          />
-          <TextField
-            label="Password"
-            variant="outlined"
-            margin="normal"
-            type="password"
-            fullWidth
-            required
-          />
-          <StyledButton variant="contained" fullWidth>
-            Sign In
-          </StyledButton>
-        </FormWrapper>
-      </StyledPaper>
-    </Container>
+    <Box
+      sx={{
+        position: "relative",
+        "&:before": {
+          content: '""',
+          background: "radial-gradient(#d2f1df, #d3d7fa, #bad8f4)",
+          backgroundSize: "400% 400%",
+          animation: "gradient 15s ease infinite",
+          position: "absolute",
+          height: "100%",
+          width: "100%",
+          opacity: "0.3",
+        },
+      }}
+    >
+      <Grid
+        container
+        spacing={0}
+        justifyContent="center"
+        sx={{ height: "100vh" }}
+      >
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          lg={4}
+          xl={3}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Card
+            elevation={9}
+            sx={{ p: 4, zIndex: 1, width: "100%", maxWidth: "500px" }}
+          >
+            <Box display="flex" alignItems="center" justifyContent="center">
+              <img src={Logo} alt="logo" style={{ width: "60px" }} />
+            </Box>
+            <AuthLogin
+              subtext={
+                <Typography
+                  variant="subtitle1"
+                  textAlign="center"
+                  color="textSecondary"
+                  mb={1}
+                >
+                  Your Social Campaigns
+                </Typography>
+              }
+              // subtitle={
+              //   <Stack
+              //     direction="row"
+              //     spacing={1}
+              //     justifyContent="center"
+              //     mt={3}
+              //   >
+              //     <Typography
+              //       color="textSecondary"
+              //       variant="h6"
+              //       fontWeight="500"
+              //     >
+              //       New to Modernize?
+              //     </Typography>
+              //   </Stack>
+              // }
+            />
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 
-export default LoginPage;
+export default Login;

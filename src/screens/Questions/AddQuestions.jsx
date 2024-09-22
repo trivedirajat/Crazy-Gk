@@ -16,17 +16,19 @@ import {
   Switch,
   Radio,
   RadioGroup,
+  Card,
 } from "@mui/material";
 import { PlusCircle, MinusCircle } from "react-feather";
-import { useGetSubjectsQuery } from "../../redux/apis/subjectapi";
+import { useGetsubjectnameQuery } from "../../redux/apis/subjectapi";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAddQuestionsMutation } from "../../redux/apis/questionapi";
+import Breadcrumbs from "component/common/Breadcrumbs";
 
 function AddQuestions() {
   const navigatpage = useNavigate();
   const [addQuestions] = useAddQuestionsMutation();
-  const { data: subjects = [] } = useGetSubjectsQuery(); // Ensure subjects is an array
+  const { data: subjects = [] } = useGetsubjectnameQuery();
   const { control, handleSubmit, register, watch, setValue } = useForm({
     defaultValues: {
       questions: [
@@ -97,392 +99,409 @@ function AddQuestions() {
       error: <b>Could not add. Try again</b>,
     });
   };
-
+  const breadcrumbItems = [
+    { label: "Dashboard", link: "/dashboard" },
+    { label: "Quiz", link: "/quiz" },
+    { label: "Add New Question" },
+  ];
   return (
-    <Box
-      component="form"
-      onSubmit={handleSubmit(onSubmit)}
-      sx={{
-        maxWidth: 800,
-        mx: "auto",
-        mt: 4,
-        p: 3,
-      }}
-    >
-      <Typography variant="h5" gutterBottom align="center">
-        Create Quiz
-      </Typography>
+    <Box sx={{ height: "100%" }}>
+      <Breadcrumbs items={breadcrumbItems} />
 
-      {/* Questions */}
-      {questionFields.map((question, qIndex) => (
-        <Box
-          key={question.id}
-          sx={{
-            mb: 3,
-            mt: 2,
-            p: 3,
-            bgcolor: "#ffffff",
-            borderRadius: 2,
-            border: "1px solid #ddd",
-            boxShadow: 1,
-          }}
-        >
-          <Typography variant="subtitle1" gutterBottom>
-            Question {qIndex + 1}
-          </Typography>
-
-          <Grid container spacing={2}>
-            {/* Subject Dropdown for each question */}
-            <Grid item xs={12}>
-              <FormControl fullWidth margin="dense" size="small">
-                <InputLabel shrink>Subject</InputLabel>
-                <Select
-                  {...register(`questions.${qIndex}.subject`, {
-                    required: true,
-                  })}
-                  label="Subject"
-                  displayEmpty
-                  sx={{ height: "36px" }}
-                  inputProps={{ "aria-label": "Without label" }}
-                >
-                  {subjects?.data ? (
-                    subjects?.data.map((subject) => (
-                      <MenuItem key={subject._id} value={subject._id}>
-                        {subject.subject_name}
-                      </MenuItem>
-                    ))
-                  ) : (
-                    <MenuItem disabled>No subjects available</MenuItem>
-                  )}
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextField
-                label="Question"
-                {...register(`questions.${qIndex}.question`, {
-                  required: true,
-                })}
-                fullWidth
-                margin="dense"
-                size="small"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <FormControl fullWidth margin="dense" size="small">
-                <InputLabel shrink>Question Type</InputLabel>
-                <Select
-                  {...register(`questions.${qIndex}.questionType`, {
-                    required: true,
-                  })}
-                  defaultValue="Multiple Choice"
-                  label="Question Type"
-                  fullWidth
-                  margin="dense"
-                  size="small"
-                  displayEmpty
-                  sx={{ height: "36px" }}
-                  inputProps={{ "aria-label": "Without label" }}
-                >
-                  <MenuItem value="Single Choice">Single Choice</MenuItem>
-                  <MenuItem value="Multiple Choice">Multiple Choice</MenuItem>
-                  <MenuItem value="True/False">True/False</MenuItem>
-                  <MenuItem value="Fill in the Blank">
-                    Fill in the Blank
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Marks"
-                type="number"
-                {...register(`questions.${qIndex}.marks`, {
-                  required: true,
-                  min: 1,
-                })}
-                fullWidth
-                margin="dense"
-                size="small"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <TextField
-                label="Time (seconds)"
-                type="number"
-                {...register(`questions.${qIndex}.time`, {
-                  required: true,
-                  min: 1,
-                })}
-                fullWidth
-                margin="dense"
-                size="small"
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    {...register(`questions.${qIndex}.isPublished`)}
-                    defaultChecked
-                  />
-                }
-                label="Published"
-              />
-            </Grid>
-          </Grid>
-
-          {/* Dynamic Options based on Question Type */}
-          {watchQuestions[qIndex]?.questionType !== "Fill in the Blank" && (
-            <>
-              <Typography variant="body2" sx={{ mt: 1 }}>
-                Options
+      <Card sx={{ padding: "24px" }}>
+        <Typography variant="h4" gutterBottom>
+          Add New Question
+        </Typography>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate autoComplete="off">
+          {/* Questions */}
+          {questionFields.map((question, qIndex) => (
+            <Box
+              key={question.id}
+              sx={{
+                mb: 3,
+                mt: 2,
+                p: 3,
+                bgcolor: "#ffffff",
+                borderRadius: 2,
+                border: "1px solid #ddd",
+                boxShadow: 1,
+              }}
+            >
+              <Typography variant="subtitle1" gutterBottom>
+                Question {qIndex + 1}
               </Typography>
-              <Controller
-                control={control}
-                name={`questions.${qIndex}.options`}
-                render={({ field: { value, onChange } }) => {
-                  return (
-                    <>
-                      {watchQuestions[qIndex]?.questionType === "True/False" ? (
-                        <RadioGroup
-                          value={value.find((o) => o.isCorrect)?.value || ""}
-                          onChange={(e) => {
-                            const newOptions = [
-                              {
-                                value: "True",
-                                isCorrect: e.target.value === "True",
-                              },
-                              {
-                                value: "False",
-                                isCorrect: e.target.value === "False",
-                              },
-                            ];
-                            handleOptionChange(qIndex, newOptions);
-                          }}
-                        >
-                          {["True", "False"].map((option) => (
-                            <FormControlLabel
-                              key={option}
-                              value={option}
-                              control={<Radio />}
-                              label={option}
-                            />
-                          ))}
-                        </RadioGroup>
-                      ) : watchQuestions[qIndex]?.questionType ===
-                        "Single Choice" ? (
+
+              <Grid container spacing={2}>
+                {/* Subject Dropdown for each question */}
+                <Grid item xs={12}>
+                  <FormControl fullWidth margin="dense" size="small">
+                    <InputLabel shrink>Subject</InputLabel>
+                    <Select
+                      {...register(`questions.${qIndex}.subject`, {
+                        required: true,
+                      })}
+                      label="Subject"
+                      displayEmpty
+                      sx={{ height: "36px" }}
+                      inputProps={{ "aria-label": "Without label" }}
+                    >
+                      {subjects?.data ? (
+                        subjects?.data.map((subject) => (
+                          <MenuItem key={subject._id} value={subject._id}>
+                            {subject.subject_name}
+                          </MenuItem>
+                        ))
+                      ) : (
+                        <MenuItem disabled>No subjects available</MenuItem>
+                      )}
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    label="Question"
+                    {...register(`questions.${qIndex}.question`, {
+                      required: true,
+                    })}
+                    fullWidth
+                    margin="dense"
+                    size="small"
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth margin="dense" size="small">
+                    <InputLabel shrink>Question Type</InputLabel>
+                    <Select
+                      {...register(`questions.${qIndex}.questionType`, {
+                        required: true,
+                      })}
+                      defaultValue="Multiple Choice"
+                      label="Question Type"
+                      fullWidth
+                      margin="dense"
+                      size="small"
+                      displayEmpty
+                      sx={{ height: "36px" }}
+                      inputProps={{ "aria-label": "Without label" }}
+                    >
+                      <MenuItem value="Single Choice">Single Choice</MenuItem>
+                      <MenuItem value="Multiple Choice">
+                        Multiple Choice
+                      </MenuItem>
+                      <MenuItem value="True/False">True/False</MenuItem>
+                      <MenuItem value="Fill in the Blank">
+                        Fill in the Blank
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Marks"
+                    type="number"
+                    {...register(`questions.${qIndex}.marks`, {
+                      required: true,
+                      min: 1,
+                    })}
+                    fullWidth
+                    margin="dense"
+                    size="small"
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    label="Time (seconds)"
+                    type="number"
+                    {...register(`questions.${qIndex}.time`, {
+                      required: true,
+                      min: 1,
+                    })}
+                    fullWidth
+                    margin="dense"
+                    size="small"
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        {...register(`questions.${qIndex}.isPublished`)}
+                        defaultChecked
+                      />
+                    }
+                    label="Published"
+                  />
+                </Grid>
+              </Grid>
+
+              {watchQuestions[qIndex]?.questionType !== "Fill in the Blank" && (
+                <>
+                  <Typography variant="body2" sx={{ mt: 1 }}>
+                    Options
+                  </Typography>
+                  <Controller
+                    control={control}
+                    name={`questions.${qIndex}.options`}
+                    render={({ field: { value, onChange } }) => {
+                      return (
                         <>
-                          <RadioGroup
-                            value={value.find((o) => o.isCorrect)?.value || ""}
-                            onChange={(e) => {
-                              const newOptions = value.map((o) => ({
-                                ...o,
-                                isCorrect: o.value === e.target.value,
-                              }));
-                              handleOptionChange(qIndex, newOptions);
-                            }}
-                          >
-                            {value.map((option, oIndex) => (
-                              <Grid
-                                container
-                                spacing={1}
-                                alignItems="center"
-                                key={oIndex}
+                          {watchQuestions[qIndex]?.questionType ===
+                          "True/False" ? (
+                            <RadioGroup
+                              value={
+                                value.find((o) => o.isCorrect)?.value || ""
+                              }
+                              onChange={(e) => {
+                                const newOptions = [
+                                  {
+                                    value: "True",
+                                    isCorrect: e.target.value === "True",
+                                  },
+                                  {
+                                    value: "False",
+                                    isCorrect: e.target.value === "False",
+                                  },
+                                ];
+                                handleOptionChange(qIndex, newOptions);
+                              }}
+                            >
+                              {["True", "False"].map((option) => (
+                                <FormControlLabel
+                                  key={option}
+                                  value={option}
+                                  control={<Radio />}
+                                  label={option}
+                                />
+                              ))}
+                            </RadioGroup>
+                          ) : watchQuestions[qIndex]?.questionType ===
+                            "Single Choice" ? (
+                            <>
+                              <RadioGroup
+                                value={
+                                  value.find((o) => o.isCorrect)?.value || ""
+                                }
+                                onChange={(e) => {
+                                  const newOptions = value.map((o) => ({
+                                    ...o,
+                                    isCorrect: o.value === e.target.value,
+                                  }));
+                                  handleOptionChange(qIndex, newOptions);
+                                }}
                               >
-                                <Grid item xs>
-                                  <TextField
-                                    label={`Option ${oIndex + 1}`}
-                                    value={option.value}
-                                    onChange={(e) => {
-                                      const newOptions = [...value];
-                                      newOptions[oIndex].value = e.target.value;
-                                      handleOptionChange(qIndex, newOptions);
-                                    }}
-                                    fullWidth
-                                    margin="dense"
-                                    size="small"
-                                  />
-                                </Grid>
-                                <Grid item>
-                                  <FormControlLabel
-                                    value={option.value}
-                                    control={
-                                      <Radio
-                                        checked={option.isCorrect}
+                                {value.map((option, oIndex) => (
+                                  <Grid
+                                    container
+                                    spacing={1}
+                                    alignItems="center"
+                                    key={oIndex}
+                                  >
+                                    <Grid item xs>
+                                      <TextField
+                                        label={`Option ${oIndex + 1}`}
+                                        value={option.value}
                                         onChange={(e) => {
-                                          const newOptions = value.map((o) => ({
-                                            ...o,
-                                            isCorrect:
-                                              o.value === e.target.value,
-                                          }));
+                                          const newOptions = [...value];
+                                          newOptions[oIndex].value =
+                                            e.target.value;
                                           handleOptionChange(
                                             qIndex,
                                             newOptions
                                           );
                                         }}
+                                        fullWidth
+                                        margin="dense"
+                                        size="small"
                                       />
-                                    }
-                                    label="Correct"
-                                  />
-                                </Grid>
-                                <Grid item>
-                                  <IconButton
-                                    color="error"
-                                    onClick={() =>
-                                      handleOptionChange(
-                                        qIndex,
-                                        value.filter(
-                                          (_, index) => index !== oIndex
-                                        )
-                                      )
-                                    }
-                                  >
-                                    <MinusCircle />
-                                  </IconButton>
-                                </Grid>
-                              </Grid>
-                            ))}
-                          </RadioGroup>
-                          <Button
-                            onClick={() =>
-                              handleOptionChange(qIndex, [
-                                ...value,
-                                { value: "", isCorrect: false },
-                              ])
-                            }
-                            variant="outlined"
-                            color="primary"
-                            startIcon={<PlusCircle />}
-                          >
-                            Add Option
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          {value.map((option, oIndex) => (
-                            <Grid
-                              container
-                              spacing={1}
-                              alignItems="center"
-                              key={oIndex}
-                            >
-                              <Grid item xs>
-                                <TextField
-                                  label={`Option ${oIndex + 1}`}
-                                  value={option.value}
-                                  onChange={(e) => {
-                                    const newOptions = [...value];
-                                    newOptions[oIndex].value = e.target.value;
-                                    handleOptionChange(qIndex, newOptions);
-                                  }}
-                                  fullWidth
-                                  margin="dense"
-                                  size="small"
-                                />
-                              </Grid>
-                              <Grid item>
-                                <FormControlLabel
-                                  control={
-                                    <Checkbox
-                                      checked={option.isCorrect}
+                                    </Grid>
+                                    <Grid item>
+                                      <FormControlLabel
+                                        value={option.value}
+                                        control={
+                                          <Radio
+                                            checked={option.isCorrect}
+                                            onChange={(e) => {
+                                              const newOptions = value.map(
+                                                (o) => ({
+                                                  ...o,
+                                                  isCorrect:
+                                                    o.value === e.target.value,
+                                                })
+                                              );
+                                              handleOptionChange(
+                                                qIndex,
+                                                newOptions
+                                              );
+                                            }}
+                                          />
+                                        }
+                                        label="Correct"
+                                      />
+                                    </Grid>
+                                    <Grid item>
+                                      <IconButton
+                                        color="error"
+                                        onClick={() =>
+                                          handleOptionChange(
+                                            qIndex,
+                                            value.filter(
+                                              (_, index) => index !== oIndex
+                                            )
+                                          )
+                                        }
+                                      >
+                                        <MinusCircle />
+                                      </IconButton>
+                                    </Grid>
+                                  </Grid>
+                                ))}
+                              </RadioGroup>
+                              <Button
+                                onClick={() =>
+                                  handleOptionChange(qIndex, [
+                                    ...value,
+                                    { value: "", isCorrect: false },
+                                  ])
+                                }
+                                variant="outlined"
+                                color="primary"
+                                startIcon={<PlusCircle />}
+                              >
+                                Add Option
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              {value.map((option, oIndex) => (
+                                <Grid
+                                  container
+                                  spacing={1}
+                                  alignItems="center"
+                                  key={oIndex}
+                                >
+                                  <Grid item xs>
+                                    <TextField
+                                      label={`Option ${oIndex + 1}`}
+                                      value={option.value}
                                       onChange={(e) => {
                                         const newOptions = [...value];
-                                        newOptions[oIndex].isCorrect =
-                                          e.target.checked;
+                                        newOptions[oIndex].value =
+                                          e.target.value;
                                         handleOptionChange(qIndex, newOptions);
                                       }}
+                                      fullWidth
+                                      margin="dense"
+                                      size="small"
                                     />
-                                  }
-                                  label="Correct"
-                                />
-                              </Grid>
-                              <Grid item>
-                                <IconButton
-                                  color="error"
-                                  onClick={() =>
-                                    handleOptionChange(
-                                      qIndex,
-                                      value.filter(
-                                        (_, index) => index !== oIndex
-                                      )
-                                    )
-                                  }
-                                >
-                                  <MinusCircle />
-                                </IconButton>
-                              </Grid>
-                            </Grid>
-                          ))}
-                          <Button
-                            onClick={() =>
-                              handleOptionChange(qIndex, [
-                                ...value,
-                                { value: "", isCorrect: false },
-                              ])
-                            }
-                            variant="outlined"
-                            color="primary"
-                            startIcon={<PlusCircle />}
-                          >
-                            Add Option
-                          </Button>
+                                  </Grid>
+                                  <Grid item>
+                                    <FormControlLabel
+                                      control={
+                                        <Checkbox
+                                          checked={option.isCorrect}
+                                          onChange={(e) => {
+                                            const newOptions = [...value];
+                                            newOptions[oIndex].isCorrect =
+                                              e.target.checked;
+                                            handleOptionChange(
+                                              qIndex,
+                                              newOptions
+                                            );
+                                          }}
+                                        />
+                                      }
+                                      label="Correct"
+                                    />
+                                  </Grid>
+                                  <Grid item>
+                                    <IconButton
+                                      color="error"
+                                      onClick={() =>
+                                        handleOptionChange(
+                                          qIndex,
+                                          value.filter(
+                                            (_, index) => index !== oIndex
+                                          )
+                                        )
+                                      }
+                                    >
+                                      <MinusCircle />
+                                    </IconButton>
+                                  </Grid>
+                                </Grid>
+                              ))}
+                              <Button
+                                onClick={() =>
+                                  handleOptionChange(qIndex, [
+                                    ...value,
+                                    { value: "", isCorrect: false },
+                                  ])
+                                }
+                                variant="outlined"
+                                color="primary"
+                                startIcon={<PlusCircle />}
+                                sx={{ mt: 2 }}
+                              >
+                                Add Option
+                              </Button>
+                            </>
+                          )}
                         </>
-                      )}
-                    </>
-                  );
-                }}
-              />
-            </>
-          )}
+                      );
+                    }}
+                  />
+                </>
+              )}
 
-          <Box sx={{ mt: 2 }}>
+              <Box sx={{ mt: 2 }}>
+                <Button
+                  onClick={() => removeQuestion(qIndex)}
+                  variant="outlined"
+                  color="error"
+                  startIcon={<MinusCircle />}
+                >
+                  Remove Question
+                </Button>
+              </Box>
+            </Box>
+          ))}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
             <Button
-              onClick={() => removeQuestion(qIndex)}
+              onClick={() =>
+                appendQuestion({
+                  question: "",
+                  questionType: "Multiple Choice",
+                  options: [{ value: "", isCorrect: false }],
+                  marks: 1,
+                  time: 30,
+                  isPublished: true,
+                  subjectId: "",
+                })
+              }
               variant="outlined"
-              color="error"
-              startIcon={<MinusCircle />}
+              color="primary"
+              startIcon={<PlusCircle />}
             >
-              Remove Question
+              Add Question
+            </Button>
+
+            <Button type="submit" variant="contained" color="primary">
+              Submit
             </Button>
           </Box>
-        </Box>
-      ))}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Button
-          onClick={() =>
-            appendQuestion({
-              question: "",
-              questionType: "Multiple Choice",
-              options: [{ value: "", isCorrect: false }],
-              marks: 1,
-              time: 30,
-              isPublished: true,
-              subjectId: "",
-            })
-          }
-          variant="outlined"
-          color="primary"
-          startIcon={<PlusCircle />}
-        >
-          Add Question
-        </Button>
-
-        <Button type="submit" variant="contained" color="primary">
-          Submit
-        </Button>
-      </Box>
+        </form>
+      </Card>
     </Box>
   );
 }

@@ -1,16 +1,22 @@
 import React from "react";
 import ScrollToTop from "ScrollToTop";
-import DefaultRouters from "./Navigation/Routers";
 import { Toaster } from "react-hot-toast";
+import { useRoutes } from "react-router-dom";
+import Routers from "./Navigation/Router";
+import { CssBaseline, ThemeProvider } from "@mui/material";
+import { baselightTheme } from "theme/DefaultColors";
 
 function App() {
+  const routing = useRoutes(Routers);
+
   return (
-    <div>
+    <ThemeProvider theme={baselightTheme}>
       <ScrollToTop>
         <Toaster />
-        <DefaultRouters />
+        <CssBaseline />
+        {routing}
       </ScrollToTop>
-    </div>
+    </ThemeProvider>
   );
 }
 

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import Axios from 'helper/Axios';
 import { apiEndPoints } from 'utils/ApiEndPoints';
 import { BASE_URL } from 'utils/Global';
 
@@ -9,7 +9,7 @@ export const fetchReviews = createAsyncThunk(
     'reviews/fetchReviews',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.fetchReview}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.fetchReview}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }
@@ -23,7 +23,7 @@ export const addReviews = createAsyncThunk(
     'reviews/addreviews',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.addReview}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.addReview}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }
@@ -37,7 +37,7 @@ export const deleteReviews = createAsyncThunk(
     'reviews/deletereviews',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.deleteReview}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.deleteReview}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }

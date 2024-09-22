@@ -1,249 +1,166 @@
-import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  deleteWhatsNew,
-  fetchWhatsNew,
-  getWhatsNewError,
-  getWhatsNewStatus,
-  selectAllWhatsNew,
-} from "../../redux/Slices/WhatsNewSlice";
+import { Box, Button, Card, IconButton, Typography } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid";
+import { IconPencil, IconTrash } from "@tabler/icons-react";
+import toast from "react-hot-toast";
+import ConfirmDialog from "component/common/ConfirmDialog";
 import { stripHtmlTags } from "utils/stripHtmlTags";
+import {
+  useDeleteWhatsNewMutation,
+  useGetWhatsNewQuery,
+} from "../../redux/apis/whatsnewapis";
+import Breadcrumbs from "component/common/Breadcrumbs";
 
 const WhatsNew = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const [selectedId, setSelectedId] = useState(null);
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  });
+  const [openDialog, setOpenDialog] = useState(false);
 
-  const allWhatsnew = useSelector(selectAllWhatsNew);
-  const status = useSelector(getWhatsNewStatus);
-  const error = useSelector(getWhatsNewError);
-  const [selectedId, setSelectedId] = useState("");
-  const navigatpage = async (navname) => {
-    console.log("navigatpage -> navname", navname);
-    navigate(navname);
+  const { data: whatsNewData, isLoading } = useGetWhatsNewQuery({
+    page: paginationModel.page,
+    pageSize: paginationModel.pageSize,
+  });
+
+  const [deleteWhatsNew] = useDeleteWhatsNewMutation();
+
+  const handleEdit = (id) => {
+    navigate(`/editwhatsnew/${id}`);
   };
-  console.log("allWhatsnew -> allWhatsnew", allWhatsnew);
 
-  useEffect(() => {
-    dispatch(
-      fetchWhatsNew({
-        limit: 200,
-        offset: 0,
-      })
-    );
-  }, [navigate]);
-  useEffect(() => {
-    if (status === "deleteSucceeded") {
-      dispatch(
-        fetchWhatsNew({
-          limit: 200,
-          offset: 0,
-        })
-      );
-    } else {
+  const handleDelete = async () => {
+    if (selectedId) {
+      try {
+        await deleteWhatsNew(selectedId).unwrap();
+        toast.success("WhatsNew item deleted successfully");
+        setOpenDialog(false);
+      } catch (error) {
+        toast.error("Failed to delete the WhatsNew item");
+      }
     }
-  }, [status, error]);
-
-  const deleteWhatsNews = (e, selectedId) => {
-    console.log("Deleting item with ID:", selectedId);
-    dispatch(
-      deleteWhatsNew({
-        whatsNew_id: selectedId,
-      })
-    );
-    setSelectedId("");
   };
+
+  const openDeleteConfirmation = (id) => {
+    setSelectedId(id);
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedId(null);
+  };
+
+  const columns = [
+    {
+      field: "title",
+      headerName: "Title",
+      flex: 1,
+      renderCell: ({ row }) => (
+        <Typography sx={{ color: "text.secondary" }}>
+          {row.title || "-"}
+        </Typography>
+      ),
+    },
+    {
+      field: "description",
+      headerName: "Description",
+      flex: 2,
+      renderCell: ({ row }) => (
+        <Typography sx={{ color: "text.secondary" }}>
+          {stripHtmlTags(row.description) || "-"}
+        </Typography>
+      ),
+    },
+    {
+      field: "actions",
+      headerName: "Actions",
+      flex: 1,
+      renderCell: (params) => (
+        <>
+          <IconButton color="primary" onClick={() => handleEdit(params.row.id)}>
+            <IconPencil />
+          </IconButton>
+          <IconButton
+            color="error"
+            onClick={() => openDeleteConfirmation(params.row.id)}
+          >
+            <IconTrash />
+          </IconButton>
+        </>
+      ),
+    },
+  ];
+
+  const rows =
+    whatsNewData?.data.map((item) => ({
+      id: item._id,
+      title: item.title,
+      description: item.description,
+    })) || [];
+
+  const breadcrumbItems = [
+    { label: "Dashboard", link: "/dashboard" },
+    { label: "Whats New" },
+  ];
 
   return (
-    <div className="page-body">
-      {/* Model_start */}
-      <div
-        class="modal fade"
-        id="exampleModal"
-        tabindex="-1"
-        role="dialog"
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">
-                Delete What's New
-              </h5>
-              <button
-                class="close"
-                type="button"
-                data-dismiss="modal"
-                aria-label="Close"
-              >
-                <span aria-hidden="true">×</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <p className="text-center">
-                <h6>Are You Sure ?</h6>
-              </p>
-              <p className="text-center">
-                <h6>Delete This What's New</h6>
-              </p>
-            </div>
-            <div class="modal-footer justify-content-center">
-              <button
-                data-dismiss="modal"
-                onClick={(e) => deleteWhatsNews(e, selectedId)}
-                class="btn btn-success mr-5"
-                type="button"
-              >
-                Yes
-              </button>
-              <button
-                class="btn btn-primary"
-                type="button"
-                data-dismiss="modal"
-                onClick={() => setSelectedId("")}
-              >
-                No
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* Model_end */}
+    <Box className="page-body" sx={{ padding: 2 }}>
+      <Breadcrumbs items={breadcrumbItems} />
 
-      <div class="container-fluid">
-        <div class="page-header">
-          <div class="row">
-            <div class="col">
-              <div class="page-header-left">
-                <h3>All Whats New</h3>
-                <ol class="breadcrumb">
-                  <li class="breadcrumb-item">
-                    <a href="index.html">
-                      {/* <i data-feather="home"></i> */}
-                      <i
-                        class="fa fa-home theme-fa-icon"
-                        aria-hidden="true"
-                      ></i>
-                    </a>
-                  </li>
-                  {/* <li class="breadcrumb-item">Add New User</li>
-                                            <li class="breadcrumb-item">Form Layout</li> */}
-                  <li class="breadcrumb-item active">All Whats New Listing</li>
-                </ol>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="container-fluid">
-        <div class="row">
-          <div class="col-sm-12 col-xl-12">
-            <div className="row pt-3">
-              <div className="col-md-6">
-                <div class="form-group">
-                  <button
-                    class="btn btn-color"
-                    onClick={() => navigatpage("/addwhatsnew")}
-                  >
-                    Add Whats New
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-sm-12 col-xl-12">
-                <div class="card">
-                  <div class="card-header">
-                    <h5>List of Whats New:</h5>
-                  </div>
-                  <div class="table-responsive">
-                    <table class="table table-border-horizontal">
-                      <thead>
-                        <tr className="text-center">
-                          <th scope="col">Image</th>
-                          <th scope="col">Title</th>
-                          <th scope="col">Description</th>
-                          <th scope="col">Action</th>
-                          <th scope="col"></th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {allWhatsnew &&
-                          allWhatsnew.map((item) => (
-                            <tr className="text-center">
-                              <td>{item?.image}</td>
-                              <td>{item?.title}</td>
-                              <td>{stripHtmlTags(item?.description)}</td>
-                              <td>
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    flexDirection: "row",
-                                    justifyContent: "space-between",
-                                  }}
-                                >
-                                  <i
-                                    class="fa fa-edit theme-fa-icon mr-3"
-                                    aria-hidden="true"
-                                    title="Edit Whats New"
-                                    onClick={() => {
-                                      navigate(`/addwhatsnew`, {
-                                        state: { id: item?._id },
-                                      });
-                                    }}
-                                  ></i>
-                                  <i
-                                    class="fa fa-trash theme-fa-icon"
-                                    aria-hidden="true"
-                                    title="Delete Whats New"
-                                    data-toggle="modal"
-                                    data-original-title="test"
-                                    data-target="#exampleModal"
-                                    onClick={() => setSelectedId(item._id)}
-                                  ></i>
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                  </div>
-                  <hr />
-                  <div className="row">
-                    <div class="col-12  ">
-                      <div class="card ">
-                        <div class="card-body ">
-                          <nav aria-label="Page navigation example ">
-                            <ul class="pagination pagination-primary float-right">
-                              <li class="page-item">
-                                <a class="page-link">Previous</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">1</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">2</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">3</a>
-                              </li>
-                              <li class="page-item">
-                                <a class="page-link">Next</a>
-                              </li>
-                            </ul>
-                          </nav>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => navigate("/addwhatsnew")}
+      >
+        Add New WhatsNew
+      </Button>
+
+      <Box sx={{ width: "100%", marginTop: 3 }}>
+        <Card>
+          <DataGrid
+            autoHeight
+            rows={rows}
+            columns={columns}
+            disableRowSelectionOnClick
+            loading={isLoading}
+            pagination
+            paginationMode="server"
+            rowCount={whatsNewData?.total_data || 0}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            pageSizeOptions={[10, 25, 50, 100]}
+            localeText={{ noRowsLabel: "No Record(s) Found" }}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                color: "#000",
+                fontWeight: "bold",
+                fontSize: "16px",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                borderBottom: "2px solid #04aa50",
+              },
+              "& .MuiDataGrid-cell": {
+                display: "flex",
+                alignItems: "center",
+              },
+            }}
+          />
+        </Card>
+      </Box>
+
+      <ConfirmDialog
+        open={openDialog}
+        title="Remove WhatsNew"
+        content="Are you sure you want to remove this item?"
+        onClose={handleCloseDialog}
+        onConfirm={handleDelete}
+      />
+    </Box>
   );
 };
+
 export default WhatsNew;

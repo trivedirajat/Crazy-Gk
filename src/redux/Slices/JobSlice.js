@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import Axios from 'helper/Axios';
 import { apiEndPoints } from "utils/ApiEndPoints";
 import { BASE_URL } from "utils/Global";
 
@@ -7,7 +7,7 @@ export const fetchJobs = createAsyncThunk(
   "Jobs/fetchJobs",
   async (data, thunkAPI) => {
     try {
-      const response = await axios.post(
+      const response = await Axios.post(
         `${BASE_URL}${apiEndPoints.fetchJob}`,
         data
       );
@@ -24,7 +24,7 @@ export const addJobs = createAsyncThunk(
   "Jobs/addJobs",
   async (data, thunkAPI) => {
     try {
-      const response = await axios.post(
+      const response = await Axios.post(
         `${BASE_URL}${apiEndPoints.addJob}`,
         data
       );
@@ -41,7 +41,7 @@ export const UpdateJobs = createAsyncThunk(
   "Jobs/UpdateJobs",
   async (data, thunkAPI) => {
     try {
-      const response = await axios.post(
+      const response = await Axios.post(
         `${BASE_URL}${apiEndPoints.updateJob}`,
         data
       );
@@ -58,7 +58,7 @@ export const deleteJobs = createAsyncThunk(
   "Jobs/deleteJobs",
   async (data, thunkAPI) => {
     try {
-      const response = await axios.post(
+      const response = await Axios.post(
         `${BASE_URL}${apiEndPoints.deleteJob}`,
         data
       );
