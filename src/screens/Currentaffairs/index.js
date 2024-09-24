@@ -72,12 +72,12 @@ const CurrentAffairsList = () => {
       ),
     },
     {
-      field: "description",
+      field: "sortdescription",
       headerName: "Description",
       flex: 2,
       renderCell: ({ row }) => (
         <Typography sx={{ color: "text.secondary" }}>{`${
-          stripHtmlTags(row.description) || "-"
+          stripHtmlTags(row?.sortdescription) || "-"
         }`}</Typography>
       ),
     },
