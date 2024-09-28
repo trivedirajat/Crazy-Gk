@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, TextField, Grid, Typography, Card } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Grid,
+  Typography,
+  Card,
+  Switch,
+  FormControlLabel,
+} from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -26,6 +35,7 @@ const AddEditBlog = ({ isEdit = false }) => {
     defaultValues: {
       title: "",
       image: null,
+      is_editorial: false, // Default value for is_editorial
     },
   });
 
@@ -34,10 +44,11 @@ const AddEditBlog = ({ isEdit = false }) => {
 
   useEffect(() => {
     if (isEdit && blogData) {
-      const { title, description, image } = blogData.data;
+      const { title, description, image, is_editorial } = blogData.data;
       setValue("title", title);
       setContent(description || "");
       setImagePreview(image || null);
+      setValue("is_editorial", is_editorial || false); // Set the default value for is_editorial
     }
   }, [isEdit, blogData, setValue]);
 
@@ -48,6 +59,7 @@ const AddEditBlog = ({ isEdit = false }) => {
     }
     data.append("title", formData.title);
     data.append("description", content); // QuillTextEditor HTML
+    data.append("is_editorial", formData.is_editorial); // Add is_editorial field
 
     try {
       if (isEdit) {
@@ -82,11 +94,13 @@ const AddEditBlog = ({ isEdit = false }) => {
     navigate("/blog");
     return null;
   }
+
   const breadcrumbItems = [
     { label: "Dashboard", link: "/dashboard" },
     { label: "Blog", link: "/blog" },
     { label: isEdit ? "Edit Blog" : "Add New Blog" },
   ];
+
   return (
     <Box sx={{ height: "100%" }}>
       <Breadcrumbs items={breadcrumbItems} />
@@ -150,6 +164,20 @@ const AddEditBlog = ({ isEdit = false }) => {
             <Grid item xs={12} md={8}>
               <Typography variant="body1">Description</Typography>
               <QuillTextEditor value={content} setContent={setContent} />
+            </Grid>
+
+            {/* Add is_editorial Switch */}
+            <Grid item xs={12} md={8}>
+              <Controller
+                name="is_editorial"
+                control={control}
+                render={({ field }) => (
+                  <FormControlLabel
+                    control={<Switch {...field} checked={field.value} />}
+                    label="Is Editorial"
+                  />
+                )}
+              />
             </Grid>
           </Grid>
 

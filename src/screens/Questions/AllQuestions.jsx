@@ -24,7 +24,7 @@ const QuestionsTable = () => {
     page: paginationModel.page,
     pageSize: paginationModel.pageSize,
   });
-  
+
   const [deleteQuestions] = useDeleteQuestionsMutation();
 
   const handleEdit = (id) => {
@@ -73,10 +73,16 @@ const QuestionsTable = () => {
       flex: 1,
       renderCell: (params) => (
         <>
-          <IconButton color="primary" onClick={() => handleEdit(params.row._id)}>
+          <IconButton
+            color="primary"
+            onClick={() => handleEdit(params.row._id)}
+          >
             <IconPencil />
           </IconButton>
-          <IconButton color="error" onClick={() => openDeleteConfirmation(params.row._id)}>
+          <IconButton
+            color="error"
+            onClick={() => openDeleteConfirmation(params.row._id)}
+          >
             <IconTrash />
           </IconButton>
         </>

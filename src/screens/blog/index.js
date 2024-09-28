@@ -67,12 +67,12 @@ const Blog = () => {
       ),
     },
     {
-      field: "description",
+      field: "sortdescription",
       headerName: "Description",
       flex: 2,
       renderCell: ({ row }) => (
         <Typography sx={{ color: "text.secondary" }}>
-          {stripHtmlTags(row.description) || "-"}
+          {stripHtmlTags(row.sortdescription) || "-"}
         </Typography>
       ),
     },
@@ -97,12 +97,6 @@ const Blog = () => {
     },
   ];
 
-  const rows =
-    blogsData?.data.map((blog) => ({
-      id: blog._id,
-      title: blog.title,
-      description: blog.description,
-    })) || [];
   const breadcrumbItems = [
     { label: "Dashboard", link: "/dashboard" },
     { label: "Blog" },
@@ -123,7 +117,8 @@ const Blog = () => {
         <Card>
           <DataGrid
             autoHeight
-            rows={rows}
+            rows={blogsData?.data}
+            getRowId={(row) => row?._id}
             columns={columns}
             disableRowSelectionOnClick
             loading={isLoading}
