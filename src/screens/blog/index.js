@@ -82,13 +82,16 @@ const Blog = () => {
       flex: 1,
       renderCell: (params) => (
         <>
-          <IconButton color="primary" onClick={() => handleEdit(params.row.id)}>
+          <IconButton
+            color="primary"
+            onClick={() => handleEdit(params.row._id)}
+          >
             {console.log(params.row)}
             <IconPencil />
           </IconButton>
           <IconButton
             color="error"
-            onClick={() => openDeleteConfirmation(params.row.id)}
+            onClick={() => openDeleteConfirmation(params.row._id)}
           >
             <IconTrash />
           </IconButton>

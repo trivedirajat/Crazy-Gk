@@ -29,6 +29,9 @@ const AddEditStudyVideo = ({ isEdit = false }) => {
   const { data: subjects } = useGetsubjectnameQuery();
   const { data: videoData } = useGetvideobyidQuery(id, {
     skip: !isEdit,
+    refetchOnMountOrArgChange: true,
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
   });
   const [addVideo] = useAddVideoMutation();
   const [editVideo] = useEditVideoMutation();
@@ -68,7 +71,7 @@ const AddEditStudyVideo = ({ isEdit = false }) => {
         toast.success("Video updated successfully!");
       } else {
         await addVideo(formData);
-        toast.success("Video added successfully!"); 
+        toast.success("Video added successfully!");
       }
       navigate("/studyvideo");
     } catch (error) {
