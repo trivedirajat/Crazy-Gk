@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import Axios from 'helper/Axios';
 import { apiEndPoints } from 'utils/ApiEndPoints';
 import { BASE_URL } from 'utils/Global';
 
@@ -7,7 +7,7 @@ export const fetchEBook = createAsyncThunk(
     'EBook/fetchEBook',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.fetchEBook}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.fetchEBook}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }
@@ -21,7 +21,7 @@ export const addeBooks = createAsyncThunk(
     'EBook/addeBooks',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.addEBook}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.addEBook}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }
@@ -35,7 +35,7 @@ export const deleteEBook = createAsyncThunk(
     'EBook/deleteEBook',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.deleteEBook}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.deleteEBook}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }

@@ -8,16 +8,19 @@ const ReviewApi = createApi({
   endpoints: (builder) => ({
     getReviewById: builder.query({
       query: (id) => ({
-        url: `${apiEndPoints.getreviewnyid}?review_id=${id}`,
+        url: `${apiEndPoints.getreviewnyid}/${id}`,
         method: "GET",
       }),
       providesTags: ["Reviews"],
     }),
     getReviews: builder.query({
-      query: (params) => ({
+      query: ({ offset = 0, limit = 10 }) => ({
         url: `${apiEndPoints.getReviews}`,
         method: "GET",
-        params,
+        params: {
+          offset,
+          limit,
+        },
       }),
       providesTags: ["Reviews"],
     }),

@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { TextField, Button, Box, Typography, Rating } from "@mui/material";
-
+import {
+  TextField,
+  Button,
+  Box,
+  Typography,
+  Rating,
+  Breadcrumbs,
+  Link,
+  Card,
+  CardContent,
+} from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   useAddReviewMutation,
@@ -9,17 +18,25 @@ import {
   useGetReviewByIdQuery,
 } from "../../redux/apis/reviewapis";
 import toast from "react-hot-toast";
+
 const ReviewForm = ({ edit = false }) => {
   const navigate = useNavigate();
   const { reviewID } = useParams();
   const {
     control,
     handleSubmit,
-    register,
     setValue,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      name: "",
+      review: "",
+      rating: 2,
+      user_profile: "",
+    },
+  });
+
   const [selectedImage, setSelectedImage] = useState(null);
   const [preview, setPreview] = useState(null);
 
@@ -33,22 +50,24 @@ const ReviewForm = ({ edit = false }) => {
 
   useEffect(() => {
     if (isReviewLoaded && edit) {
-      const { name, review, rating } = existingReview?.data;
+      const { name, review, rating, user_profile } = existingReview?.data;
       setValue("name", name);
       setValue("review", review);
       setValue("rating", rating);
-      setPreview(existingReview?.data?.user_profile || null);
+      setPreview(user_profile || null);
     }
   }, [isReviewLoaded, existingReview, edit, setValue]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setSelectedImage(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result);
-    };
-    reader.readAsDataURL(file);
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const onSubmit = async (data) => {
@@ -62,7 +81,6 @@ const ReviewForm = ({ edit = false }) => {
 
     try {
       if (edit) {
-        // Update review if in edit mode
         const response = await updateReview({
           id: reviewID,
           reviewData: formData,
@@ -74,7 +92,6 @@ const ReviewForm = ({ edit = false }) => {
           toast.error("Failed to update review");
         }
       } else {
-        // Create new review if in create mode
         const response = await createReview(formData).unwrap();
         if (response?.status === 201) {
           toast.success("Review created successfully");
@@ -88,141 +105,137 @@ const ReviewForm = ({ edit = false }) => {
       setPreview(null);
       setSelectedImage(null);
     } catch (error) {
-      console.error("Error submitting review", error);
       toast.error(`Failed to ${edit ? "update" : "create"} review`);
     }
   };
 
   return (
-    <div className="page-body">
-      <div className="container-fluid">
-        <div className="page-header">
-          <div className="row">
-            <div className="col">
-              <div className="page-header-left">
-                <h3>Reviews</h3>
-                <ol className="breadcrumb">
-                  <li className="breadcrumb-item">
-                    <a href="index.html">
-                      <i data-feather="home"></i>
-                    </a>
-                  </li>
-                  <li
-                    className="breadcrumb-item"
-                    onClick={() => {
-                      navigate("/review");
-                    }}
-                  >
-                    Reviews Listing
-                  </li>
-                  <li className="breadcrumb-item active">Add New Reviews</li>
-                </ol>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="container-fluid">
-        <div className="row ">
-          <div className="col-sm-12 ">
-            <div className="card">
-              <div className="card-header">
-                <h5> {edit ? "Edit Your Review" : "Submit Your Review"}</h5>
-              </div>
-              <form
-                className="form theme-form"
-                onSubmit={handleSubmit(onSubmit)}
-                style={{ padding: "20px" }}
-              >
-                {/* Name Field */}
+    <Box sx={{ padding: "20px" }}>
+      {/* Breadcrumbs */}
+      <Breadcrumbs aria-label="breadcrumb" sx={{ marginBottom: "20px" }}>
+        <Link underline="hover" color="inherit" onClick={() => navigate("/")}>
+          Home
+        </Link>
+        <Link
+          underline="hover"
+          color="inherit"
+          onClick={() => navigate("/review")}
+        >
+          Reviews
+        </Link>
+        <Typography color="text.primary">
+          {edit ? "Edit Review" : "Add Review"}
+        </Typography>
+      </Breadcrumbs>
+
+      <Card>
+        <CardContent>
+          <Typography variant="h4" gutterBottom>
+            {edit ? "Edit Your Review" : "Submit Your Review"}
+          </Typography>
+
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            {/* Name Field */}
+            <Controller
+              name="name"
+              control={control}
+              rules={{ required: "Name is required" }}
+              render={({ field }) => (
                 <TextField
-                  {...register("name", { required: "Name is required" })}
+                  {...field}
                   label="Name"
                   fullWidth
+                  size="small"
                   margin="normal"
                   error={!!errors.name}
-                  helperText={errors.name ? errors.name.message : ""}
+                  helperText={errors.name?.message || ""}
                 />
+              )}
+            />
 
-                {/* Review (Description) Field */}
+            {/* Review Field */}
+            <Controller
+              name="review"
+              control={control}
+              rules={{ required: "Review is required" }}
+              render={({ field }) => (
                 <TextField
-                  {...register("review", {
-                    required: "Review is required",
-                  })}
+                  {...field}
                   label="Review"
                   fullWidth
                   multiline
                   rows={4}
+                  size="small"
                   margin="normal"
                   error={!!errors.review}
-                  helperText={errors.review ? errors.review.message : ""}
+                  helperText={errors.review?.message || ""}
                 />
+              )}
+            />
 
-                {/* Rating (Star Rating) */}
-                <Box sx={{ marginBottom: 2 }}>
-                  <Typography component="legend">Rating</Typography>
-                  <Controller
-                    name="rating"
-                    control={control}
-                    defaultValue={2}
-                    rules={{ required: "Rating is required" }}
-                    render={({ field }) => (
-                      <Rating
-                        {...field}
-                        precision={1}
-                        value={Number(field.value)}
-                        onChange={(_, value) => field.onChange(value)}
-                      />
-                    )}
+            {/* Rating Field */}
+            <Box sx={{ marginBottom: 2 }}>
+              <Typography component="legend">Rating</Typography>
+              <Controller
+                name="rating"
+                control={control}
+                rules={{ required: "Rating is required" }}
+                render={({ field }) => (
+                  <Rating
+                    {...field}
+                    precision={1}
+                    value={Number(field.value)}
+                    onChange={(_, value) => field.onChange(value)}
                   />
-                  {errors.rating && (
-                    <Typography color="error">
-                      {errors.rating.message}
-                    </Typography>
-                  )}
-                </Box>
+                )}
+              />
+              {errors.rating && (
+                <Typography color="error">{errors.rating.message}</Typography>
+              )}
+            </Box>
 
-                {/* Image Upload (user_profile) */}
+            {/* Image Upload */}
+            <Box sx={{ marginBottom: 2 }}>
+              <Typography>Upload Profile Image</Typography>
+              <input
+                accept="image/*"
+                type="file"
+                onChange={handleImageChange}
+              />
+              {preview && (
                 <Box
+                  mt={2}
                   sx={{
-                    marginBottom: 2,
-                    display: "flex",
-                    alignItems: "center",
+                    width: "100px",
+                    height: "100px",
+                    border: "1px solid #ddd",
+                    borderRadius: "4px",
+                    overflow: "hidden",
                   }}
                 >
-                  <Box>
-                    <Typography component="legend">
-                      Upload Profile Image
-                    </Typography>
-                    <input
-                      accept="image/*"
-                      type="file"
-                      {...register("user_profile")}
-                      onChange={handleImageChange}
-                    />
-                  </Box>
-                  {preview && (
-                    <Box mt={2}>
-                      <img
-                        src={preview}
-                        alt="Profile Preview"
-                        width="200"
-                        style={{ borderRadius: "7px" }}
-                      />
-                    </Box>
-                  )}
+                  <img
+                    src={preview}
+                    alt="Profile Preview"
+                    style={{ width: "100%", height: "100%" }}
+                  />
                 </Box>
+              )}
+            </Box>
 
-                {/* Submit Button */}
-                <Button type="submit" variant="contained" color="primary">
-                  {edit ? "Update Review" : "Submit Review"}
-                </Button>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              size="small"
+            >
+              {edit ? "Update Review" : "Submit Review"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </Box>
   );
 };
+
 export default ReviewForm;

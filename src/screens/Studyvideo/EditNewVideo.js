@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
 import "./SwitchButton.css";
-import Header from "../../component/Header";
-import SideBar from "../../component/SideNav";
-import Footer from "../../component/Footer";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   fetchSubjects,

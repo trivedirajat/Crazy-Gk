@@ -1,5 +1,5 @@
 // import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-// import axios from 'axios';
+// import Axios from 'Axios';
 // import { apiEndPoints } from 'utils/ApiEndPoints';
 // import { BASE_URL } from 'utils/Global';
 
@@ -7,7 +7,7 @@
 //     'DailyVocabs/fetchDailyVocabs',
 //     async (data, thunkAPI) => {
 //         try {
-//             const response = await axios.post(`${BASE_URL}${apiEndPoints.fetchDailyVocab}`, data);
+//             const response = await Axios.post(`${BASE_URL}${apiEndPoints.fetchDailyVocab}`, data);
 //             if (response.status !== 200) {
 //                 throw new Error('Failed to fetch data');
 //             }
@@ -21,7 +21,7 @@
 //     'DailyVocabs/addDailyVocabs',
 //     async (data, thunkAPI) => {
 //         try {
-//             const response = await axios.post(`${BASE_URL}${apiEndPoints.addDailyVocab}`, data);
+//             const response = await Axios.post(`${BASE_URL}${apiEndPoints.addDailyVocab}`, data);
 //             if (response.status !== 200) {
 //                 throw new Error('Failed to fetch data');
 //             }
@@ -35,7 +35,7 @@
 //     'DailyVocabs/deleteDailyVocabs',
 //     async (data, thunkAPI) => {
 //         try {
-//             const response = await axios.post(`${BASE_URL}${apiEndPoints.deleteDailyVocab}`, data);
+//             const response = await Axios.post(`${BASE_URL}${apiEndPoints.deleteDailyVocab}`, data);
 //             if (response.status !== 200) {
 //                 throw new Error('Failed to fetch data');
 //             }
@@ -109,7 +109,7 @@
 // export default DailyVocabsSlice.reducer;
 
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import Axios from 'helper/Axios';
 import { apiEndPoints } from 'utils/ApiEndPoints';
 import { BASE_URL } from 'utils/Global';
 
@@ -119,7 +119,7 @@ export const fetchDailyVocabs = createAsyncThunk(
     'subjects/fetchSubjects',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.fetchDailyVocab}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.fetchDailyVocab}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }
@@ -133,7 +133,7 @@ export const addDailyVocabs = createAsyncThunk(
     'subjects/addSubjects',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.addDailyVocab}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.addDailyVocab}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }
@@ -147,7 +147,7 @@ export const deleteDailyVocabs = createAsyncThunk(
     'subjects/deleteSubjects',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.deleteDailyVocab}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.deleteDailyVocab}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }

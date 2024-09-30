@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import Axios from 'helper/Axios';
 import { apiEndPoints } from 'utils/ApiEndPoints';
 import { BASE_URL } from 'utils/Global';
 
@@ -7,7 +7,7 @@ export const fetchVideos = createAsyncThunk(
     'subjects/fetchVideos',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.getVideos}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.getVideos}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }
@@ -21,7 +21,7 @@ export const addVideos = createAsyncThunk(
     'subjects/addVideos',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.addVideo}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.addVideo}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }
@@ -35,7 +35,7 @@ export const deleteVideos = createAsyncThunk(
     'subjects/deleteVideos',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.deleteVideo}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.deleteVideo}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }

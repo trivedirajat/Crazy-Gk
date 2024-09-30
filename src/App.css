@@ -1,41 +1,3 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
 .ql-font-Anek-Devanagari {
   font-family: "Anek Devanagari";
 }
@@ -76,84 +38,55 @@
   content: "Devanagari" !important;
   font-family: "Anek Devanagari" !important;
 }
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-label[data-value="Roboto"]::before,
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-item[data-value="Roboto"]::before {
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="Roboto"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="Roboto"]::before {
   content: "Roboto" !important;
   font-family: "Roboto" !important;
 }
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-label[data-value="Raleway"]::before,
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-item[data-value="Raleway"]::before {
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="Raleway"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="Raleway"]::before {
   content: "Raleway" !important;
   font-family: "Raleway" !important;
 }
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-label[data-value="Montserrat"]::before,
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-item[data-value="Montserrat"]::before {
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="Montserrat"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="Montserrat"]::before {
   content: "Montserrat" !important;
   font-family: "Montserrat" !important;
 }
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-label[data-value="Lato"]::before,
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-item[data-value="Lato"]::before {
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="Lato"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="Lato"]::before {
   content: "Lato" !important;
   font-family: "Lato" !important;
 }
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-label[data-value="Rubik"]::before,
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-item[data-value="Rubik"]::before {
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="Rubik"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="Rubik"]::before {
   content: "Rubik" !important;
   font-family: "Rubik" !important;
 }
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-label[data-value="Hind"]::before,
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-item[data-value="Hind"]::before {
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="Hind"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="Hind"]::before {
   content: "Hind" !important;
   font-family: "Hind" !important;
 }
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-label[data-value="Cairo"]::before,
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-item[data-value="Cairo"]::before {
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="Cairo"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="Cairo"]::before {
   content: "Cairo" !important;
   font-family: "Cairo" !important;
 }
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-label[data-value="Amiko"]::before,
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-item[data-value="Amiko"]::before {
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="Amiko"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="Amiko"]::before {
   content: "Amiko" !important;
   font-family: "Amiko" !important;
 }
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-label[data-value="Kalnia-Glaze"]::before,
-.ql-snow
-  .ql-picker.ql-font
-  .ql-picker-item[data-value="Kalnia-Glaze"]::before {
+.ql-snow .ql-picker.ql-font .ql-picker-label[data-value="Kalnia-Glaze"]::before,
+.ql-snow .ql-picker.ql-font .ql-picker-item[data-value="Kalnia-Glaze"]::before {
   content: "Kalnia Glaze" !important;
   font-family: "Kalnia Glaze" !important;
+  border: 1px solid black;
+}
+.ql-snow .ql-picker.ql-expanded .ql-picker-options {
+  z-index: 800000 !important;
+  max-height: 200px !important;
+  overflow-y: scroll !important;
+  padding-top: 0 !important;
 }

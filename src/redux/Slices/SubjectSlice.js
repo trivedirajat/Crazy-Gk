@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import Axios from 'helper/Axios';
 import { apiEndPoints } from "utils/ApiEndPoints";
 import { BASE_URL } from "utils/Global";
 
@@ -9,7 +9,7 @@ export const fetchSubjects = createAsyncThunk(
   "subjects/fetchSubjects",
   async (data, thunkAPI) => {
     try {
-      const response = await axios.post(
+      const response = await Axios.post(
         `${BASE_URL}${apiEndPoints.getSubject}`,
         data
       );
@@ -26,7 +26,7 @@ export const addSubjects = createAsyncThunk(
   "subjects/addSubjects",
   async (data, thunkAPI) => {
     try {
-      const response = await axios.post(
+      const response = await Axios.post(
         `${BASE_URL}${apiEndPoints.addSubject}`,
         data,
         { headers: { "Content-Type": "multipart/form-data" } }
@@ -44,7 +44,7 @@ export const deleteSubjects = createAsyncThunk(
   "subjects/deleteSubjects",
   async (data, thunkAPI) => {
     try {
-      const response = await axios.post(
+      const response = await Axios.post(
         `${BASE_URL}${apiEndPoints.deleteSubject}`,
         data
       );

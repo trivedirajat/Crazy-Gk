@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Header from "../../component/Header";
-import SideBar from "../../component/SideNav";
-import Footer from "../../component/Footer";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addeBooks, getEBookStatus, selectedEBookWithId } from "../../redux/Slices/EBookSlice";
 

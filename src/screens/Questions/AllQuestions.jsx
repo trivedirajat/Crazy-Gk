@@ -1,149 +1,147 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Box, Button, Card, IconButton } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { Link, useNavigate } from "react-router-dom";
+import { IconPencil, IconTrash } from "@tabler/icons-react";
+import toast from "react-hot-toast";
+
+import Breadcrumbs from "component/common/Breadcrumbs";
+import CustomDialog from "../../component/common/CustomDialog";
 import {
   useDeleteQuestionsMutation,
   useGetQuestionsQuery,
 } from "../../redux/apis/questionapi";
-import CustomDialog from "../../component/common/CustomDialog";
-import toast from "react-hot-toast";
 
 const QuestionsTable = () => {
+  const navigate = useNavigate();
+  const [dialog, setDialog] = useState({ open: false, id: "" });
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
+  });
+
+  const { data: questionsData, isLoading } = useGetQuestionsQuery({
+    page: paginationModel.page,
+    pageSize: paginationModel.pageSize,
+  });
+
   const [deleteQuestions] = useDeleteQuestionsMutation();
-  const [dialog, setDialog] = useState({
-    open: false,
-    id: "",
-  });
-  const { data: questions = [] } = useGetQuestionsQuery({
-    id: "",
-  });
-  const navigatpage = useNavigate();
+
   const handleEdit = (id) => {
-    navigatpage(`/EditQuestion/${id}`);
+    navigate(`/EditQuestion/${id}`);
   };
 
-  const handleconformdelete = async () => {
-    const res = deleteQuestions(dialog.id);
-    toast.promise(res, {
-      loading: "Deleting...",
-      success: <b>Question deleted successfully</b>,
-      error: <b>Could not delete. Try again</b>,
-    });
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteQuestions(dialog.id).unwrap();
+      toast.success("Question deleted successfully");
+    } catch (error) {
+      toast.error("Could not delete. Try again");
+    }
     setDialog({ open: false, id: "" });
   };
+
+  const openDeleteConfirmation = (id) => {
+    setDialog({ open: true, id });
+  };
+
+  const breadcrumbItems = [
+    { label: "Dashboard", link: "/dashboard" },
+    { label: "All Questions" },
+  ];
+
   const columns = [
-    { field: "question", headerName: "Question", width: 200 },
-    { field: "questionType", headerName: "Question Type", width: 180 },
-    { field: "marks", headerName: "Marks", width: 100 },
-    { field: "time", headerName: "Time (sec)", width: 120 },
+    { field: "question", headerName: "Question", flex: 1 },
+    { field: "questionType", headerName: "Question Type", flex: 1 },
+    { field: "marks", headerName: "Marks", flex: 1 },
+    { field: "time", headerName: "Time (sec)", flex: 1 },
     {
       field: "isPublished",
       headerName: "Published",
-      width: 130,
+      flex: 1,
       renderCell: (params) => (params.value ? "Yes" : "No"),
     },
     {
       field: "subject",
       headerName: "Subject",
-      width: 150,
-      renderCell: (params) => params?.row?.subject?.subject_name,
+      flex: 1,
+      renderCell: (params) => params.row.subject?.subject_name || "-",
     },
-
     {
       field: "actions",
       headerName: "Actions",
-      width: 150,
+      flex: 1,
       renderCell: (params) => (
-        <div>
-          <i
-            className="fa fa-edit theme-fa-icon mr-3"
-            aria-hidden="true"
-            title="Edit Question"
+        <>
+          <IconButton
+            color="primary"
             onClick={() => handleEdit(params.row._id)}
-          ></i>
-
-          <i
-            className="fa fa-trash theme-fa-icon "
-            aria-hidden="true"
-            title="Delete Question"
-            onClick={() => setDialog({ open: true, id: params.row._id })}
-          ></i>
-        </div>
+          >
+            <IconPencil />
+          </IconButton>
+          <IconButton
+            color="error"
+            onClick={() => openDeleteConfirmation(params.row._id)}
+          >
+            <IconTrash />
+          </IconButton>
+        </>
       ),
     },
   ];
+
   return (
-    <div className="page-body">
-      <div className="container-fluid">
-        <div className="page-header">
-          <div className="row">
-            <div className="col">
-              <div className="page-header-left">
-                <h3>All Questions</h3>
-                <ol className="breadcrumb">
-                  <li className="breadcrumb-item">
-                    <Link to="/">
-                      <i
-                        className="fa fa-home theme-fa-icon"
-                        aria-hidden="true"
-                      ></i>
-                    </Link>
-                  </li>
-                  <li className="breadcrumb-item active">
-                    All Questions Listing
-                  </li>
-                </ol>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-sm-12 col-xl-12">
-            <div className="row pt-3">
-              <div className="col-md-6">
-                <div className="form-group">
-                  <button
-                    className="btn btn-color"
-                    onClick={() => navigatpage("/addnewquestions")}
-                  >
-                    Add New Question
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-sm-12 col-xl-12">
-                <div className="card">
-                  <div className="card-header">
-                    <h5>List of Questions:</h5>
-                  </div>
-                  <DataGrid
-                    rows={questions?.data}
-                    columns={columns}
-                    pageSize={10}
-                    rowSelection={false}
-                    rowsPerPageOptions={[10, 25, 50, 100]}
-                    getRowId={(row) => row._id}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <Box className="page-body" sx={{ padding: 2 }}>
+      {/* Breadcrumbs Section */}
+      <Breadcrumbs items={breadcrumbItems} />
+
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => navigate("/addnewquestions")}
+      >
+        Add New Question
+      </Button>
+
+      <Box sx={{ width: "100%", marginTop: 3 }}>
+        <Card>
+          <DataGrid
+            autoHeight
+            rows={questionsData?.data || []}
+            getRowId={(row) => row._id}
+            columns={columns}
+            pagination
+            paginationMode="server"
+            rowCount={questionsData?.total_data || 0}
+            paginationModel={paginationModel}
+            pageSizeOptions={[10, 25, 50, 100]}
+            onPaginationModelChange={setPaginationModel}
+            loading={isLoading}
+            localeText={{ noRowsLabel: "No Record(s) Found" }}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                color: "#000",
+                fontWeight: "bold",
+                fontSize: "16px",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                borderBottom: "2px solid #04aa50",
+              },
+            }}
+          />
+        </Card>
+      </Box>
 
       <CustomDialog
         open={dialog.open}
         title="Are you sure you want to delete this question?"
         onClose={() => setDialog({ open: false, id: "" })}
-        onConfirm={handleconformdelete}
+        onConfirm={handleConfirmDelete}
         confirmText="Confirm"
         cancelText="Cancel"
         cancelButtonColor="error"
       />
-    </div>
+    </Box>
   );
 };
 

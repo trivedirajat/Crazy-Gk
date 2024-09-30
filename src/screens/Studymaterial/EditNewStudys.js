@@ -1,288 +1,152 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import {
-  fetchSubjects,
-  selectAllsubject,
-} from "../../redux/Slices/SubjectSlice";
-import { useDispatch, useSelector } from "react-redux";
+  Box,
+  Button,
+  TextField,
+  Grid,
+  Typography,
+  Card,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+} from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+import { useForm, Controller } from "react-hook-form";
 
-import "../../App.css";
-import QuillTextEditor from "./QuillTextEditor";
+import QuillTextEditor from "screens/Studymaterial/QuillTextEditor";
+import toast from "react-hot-toast";
+import Breadcrumbs from "component/common/Breadcrumbs";
+import { useGetSubjectsQuery } from "../../redux/apis/subjectapi";
 import {
   useEditStudyMutation,
-  useGetStudymaterialQuery,
+  useGetStudyMaterialbyidQuery,
 } from "../../redux/apis/studyapis";
-import { stripHtmlTags } from "utils/stripHtmlTags";
-import toast from "react-hot-toast";
 
-const AddStudysMaterial = () => {
-  const navigate = useNavigate();
+const AddStudyMaterial = ({ isEdit = false }) => {
   const { id } = useParams();
-  const dispatch = useDispatch();
-  const { data, isLoading } = useGetStudymaterialQuery(
-    { id },
-    {
-      skip: !id,
-      refetchOnMountOrArgChange: true,
-    }
-  );
-  const [editStudy] = useEditStudyMutation();
-  const allSubjects = useSelector(selectAllsubject);
-  const editor = useRef(null);
-  const [content, setContent] = useState("");
+  const navigate = useNavigate();
 
-  const [studyData, setStudyData] = useState({
-    subject_id: "",
-    title: "",
-    description: {
+  // Fetching subjects and study data
+  const { data: subjectsData } = useGetSubjectsQuery();
+  const { data: studyData, isLoading } = useGetStudyMaterialbyidQuery(id, {
+    skip: !isEdit,
+    refetchOnMountOrArgChange: true,
+  });
+
+  const [editStudy] = useEditStudyMutation();
+
+  // React Hook Form setup
+  const { control, handleSubmit, setValue } = useForm({
+    defaultValues: {
+      subject_id: "",
       title: "",
       description: "",
     },
   });
 
-  const handleValueChange = (event) => {
-    const { name, value } = event.target;
-    setStudyData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-  useEffect(() => {
-    dispatch(
-      fetchSubjects({
-        limit: 200,
-        offset: 0,
-      })
-    );
-  }, []);
-  useEffect(() => {
-    if (data) {
-      const { subject_id, topic_name, containt } = data?.data;
-      setStudyData({
-        subject_id,
-        title: topic_name,
-        description: {
-          title: topic_name,
-          description: containt,
-        },
-      });
-      setContent(data?.data?.containt);
-    }
-  }, [data]);
-  const editStudyMaterial = async (e) => {
-    e.preventDefault();
-    if (stripHtmlTags(content).length > 600) {
-      toast.error("Content length should be less than 100");
-      return;
-    }
-    const data = {
-      id,
-      subject_id: studyData.subject_id,
-      topic_name: studyData.title,
-      containt: content,
-    };
+  const [content, setContent] = useState("");
 
-    const { data: response } = await editStudy(data);
-    if (response) {
-      const { status } = response;
-      if (status === 200) {
+  // Set form values if editing
+  useEffect(() => {
+    if (isEdit && studyData) {
+      const { subject_id, topic_name, containt } = studyData?.data;
+      setValue("subject_id", subject_id);
+      setValue("title", topic_name);
+      setContent(containt || "");
+    }
+  }, [isEdit, studyData, setValue]);
+
+  const onSubmit = async (formData) => {
+    try {
+      const data = {
+        id,
+        subject_id: formData.subject_id,
+        topic_name: formData.title,
+        containt: content, // QuillTextEditor HTML content
+      };
+      const { data: response } = await editStudy(data);
+      if (response) {
+        toast.success("Study material updated successfully!");
         navigate("/studys");
       }
+    } catch (error) {
+      toast.error("An error occurred!");
     }
   };
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+
+  if (isLoading) return <div>Loading...</div>;
 
   return (
-    <div className="page-body">
-      <div class="">
-        <div class="page-header">
-          <div class="row">
-            <div class="col">
-              <div class="page-header-left">
-                <h3>Add New Study Material</h3>
-                <ol class="breadcrumb">
-                  <li class="breadcrumb-item">
-                    <a href="index.html">
-                      <i data-feather="home"></i>
-                    </a>
-                  </li>
-                  <li
-                    class="breadcrumb-item"
-                    onClick={() => navigate("/studys")}
-                  >
-                    All Study Material Listing
-                  </li>
-                  <li class="breadcrumb-item active">edit Study Material</li>
-                </ol>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="container-fluid">
-        <div class="row ">
-          <div class="col-sm-12 ">
-            <div class="card">
-              <div class="card-header">
-                <h5>Add New Study Material</h5>
-              </div>
-              <form class="form theme-form">
-                <div class="card-body">
-                  <div class="row ">
-                    <div class="col-md-8">
-                      <span className="cardText">Subject dropdown</span>
-                      <select
-                        class="form-control btn-square"
-                        id="formcontrol-select1"
-                        name="subject_id"
-                        value={studyData.subject_id}
-                        onChange={(e) => handleValueChange(e)}
-                      >
-                        <option value={""}>Select Subject</option>
-                        {allSubjects &&
-                          allSubjects.map((item) => (
-                            <option value={item._id}>
-                              {item?.subject_name}
-                            </option>
-                          ))}
-                      </select>
-                    </div>
-                  </div>
-                  <br />
-                  <div class="row">
-                    <div class="col-md-8">
-                      <div class="form-group">
-                        <label for="exampleFormControlLastName">
-                          Subject Topics
-                        </label>
-                        <input
-                          class="form-control"
-                          id="exampleFormControlLastName"
-                          type="text"
-                          placeholder="Subject Topic"
-                          name="title"
-                          value={studyData.title}
-                          onChange={(val) => handleValueChange(val)}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  {/* <div class="row">
-                    <div class="col-md-8">
-                      <div class="form-group">
-                        <label htmlFor="videoTitle">Study Topic Content</label>
+    <Box sx={{ height: "100%" }}>
+      <Breadcrumbs
+        items={[
+          { label: "Dashboard", link: "/dashboard" },
+          { label: "Study Material", link: "/studys" },
+          { label: isEdit ? "Edit Study Material" : "Add Study Material" },
+        ]}
+      />
+      <Card sx={{ padding: "24px" }}>
+        <Typography variant="h4" gutterBottom sx={{ marginBottom: "24px" }}>
+          {isEdit ? "Edit Study Material" : "Add Study Material"}
+        </Typography>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate autoComplete="off">
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={8}>
+              <Controller
+                name="subject_id"
+                control={control}
+                rules={{ required: "Subject is required" }}
+                render={({ field }) => (
+                  <FormControl fullWidth size="small">
+                    <InputLabel>Select Subject</InputLabel>
+                    <Select {...field} label="Select Subject">
+                      {subjectsData?.map((subject) => (
+                        <MenuItem key={subject._id} value={subject._id}>
+                          {subject.subject_name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
+              />
+            </Grid>
 
-                        {studyTopicContent &&
-                          studyTopicContent.map((item, index) => (
-                            <div className="row">
-                              <div className="col-md-8">
-                                <div className="form-group">
-                                  <div>
-                                    <input
-                                      className="form-control"
-                                      id="videoTitle"
-                                      type="text"
-                                      placeholder="Title"
-                                      name="title"
-                                      value={item.title}
-                                      onChange={(e) =>
-                                        handleValueChangeContent(
-                                          index,
-                                          "title",
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                    <input
-                                      className="form-control"
-                                      id="videoTitle"
-                                      type="text"
-                                      placeholder="Description"
-                                      name="description"
-                                      value={item.description}
-                                      onChange={(e) =>
-                                        handleValueChangeContent(
-                                          index,
-                                          "description",
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </div>
-                                </div>
-                              </div>
-                              <div className="col-md-4">
-                                {index === 0 ? (
-                                  <button
-                                    type="button"
-                                    className="btn btn-success"
-                                    onClick={addVideoField}
-                                  >
-                                    +
-                                  </button>
-                                ) : (
-                                  <>
-                                    <button
-                                      type="button"
-                                      className="btn btn-success"
-                                      onClick={addVideoField}
-                                    >
-                                      +
-                                    </button>
-                                    <button
-                                      type="button"
-                                      className="btn btn-danger"
-                                      onClick={() => removeVideoField(index)}
-                                    >
-                                      -
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  </div> */}
-                  <div className="row">
-                    <div className="col-md-8">
-                      <div className="form-group">
-                        <label htmlFor="exampleFormControlLastName">
-                          Description
-                        </label>
-                        <QuillTextEditor
-                          id="exampleFormControlLastName"
-                          value={content}
-                          setContent={(newContent) => setContent(newContent)}
-                          style={{ padding: "0" }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="row">
-                  <div className="col-md-12 ">
-                    <div className="card-footer float-right">
-                      <button
-                        className="btn btn-color"
-                        type="submit"
-                        onClick={(e) => {
-                          editStudyMaterial(e);
-                        }}
-                      >
-                        Update
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            <Grid item xs={12} md={8}>
+              <Controller
+                name="title"
+                control={control}
+                rules={{ required: "Topic title is required" }}
+                render={({ field, fieldState }) => (
+                  <TextField
+                    {...field}
+                    label="Topic Title"
+                    size="small"
+                    fullWidth
+                    error={!!fieldState.error}
+                    helperText={
+                      fieldState.error ? fieldState.error.message : ""
+                    }
+                  />
+                )}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={8}>
+              <Typography variant="body1">Description</Typography>
+              <QuillTextEditor value={content} setContent={setContent} />
+            </Grid>
+          </Grid>
+
+          <Box sx={{ mt: 3 }}>
+            <Button type="submit" variant="contained" color="primary">
+              {isEdit ? "Update" : "Add"}
+            </Button>
+          </Box>
+        </form>
+      </Card>
+    </Box>
   );
 };
-export default AddStudysMaterial;
+
+export default AddStudyMaterial;

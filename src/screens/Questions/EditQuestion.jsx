@@ -21,10 +21,10 @@ import {
   Alert, // Import Alert for error state
 } from "@mui/material";
 import { PlusCircle, MinusCircle } from "react-feather";
-import { useGetSubjectsQuery } from "../../redux/apis/subjectapi";
+import { useGetsubjectnameQuery } from "../../redux/apis/subjectapi";
 import {
   useEditQuestionsMutation,
-  useGetQuestionsQuery,
+  useGetquestionsbyidQuery,
 } from "../../redux/apis/questionapi"; // Import the useGetQuestionsQuery hook
 import toast from "react-hot-toast";
 
@@ -32,17 +32,19 @@ function EditQuestions() {
   const { Questionid } = useParams();
   const navigatpage = useNavigate();
   const [editQuestions] = useEditQuestionsMutation();
-  const { data: subjects = [] } = useGetSubjectsQuery();
+  const { data: subjects = [] } = useGetsubjectnameQuery();
   const {
     data: questionData = { data: [] },
     isLoading,
     isError,
-  } = useGetQuestionsQuery(
+  } = useGetquestionsbyidQuery(
     {
       id: Questionid,
     },
     {
-      skip: Questionid === undefined,
+      skip: !Questionid,
+      refetchOnMountOrArgChange: true,
+      refetchOnFocus: true,
     }
   );
   const { control, handleSubmit, register, watch, setValue } = useForm({
@@ -65,7 +67,7 @@ function EditQuestions() {
       setValue("questions.0", questionData.data);
       [questionData?.data].forEach((question, qIndex) => {
         const newType = question.questionType;
-        setValue(`questions.${qIndex}.subject`, question.subject);
+        setValue(`questions.${qIndex}.subject`, question.subject?._id);
 
         if (newType === "True/False") {
           const newOptions = ["True", "False"].map((value) => ({

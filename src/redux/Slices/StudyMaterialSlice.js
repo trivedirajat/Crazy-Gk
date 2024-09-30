@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import Axios from 'helper/Axios';
 import { apiEndPoints } from 'utils/ApiEndPoints';
 import { BASE_URL } from 'utils/Global';
 
@@ -7,7 +7,7 @@ export const fetchStudyMaterials = createAsyncThunk(
     'StudyMaterials/fetchStudyMaterials',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.getStudyMaterial}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.getStudyMaterial}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }
@@ -21,7 +21,7 @@ export const addStudyMaterials = createAsyncThunk(
     'StudyMaterials/addStudyMaterials',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.addStudyMaterial}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.addStudyMaterial}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }
@@ -35,7 +35,7 @@ export const deleteStudyMaterials = createAsyncThunk(
     'StudyMaterials/deleteStudyMaterials',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.deleteStudyMaterial}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.deleteStudyMaterial}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import Axios from 'helper/Axios';
 import { apiEndPoints } from 'utils/ApiEndPoints';
 import { BASE_URL } from 'utils/Global';
 
@@ -8,7 +8,7 @@ export const fetchWhatsNew = createAsyncThunk(
     async (data, thunkAPI) => {
         console.log('WhatsNew',data);
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.fetchWhatsNew}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.fetchWhatsNew}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }
@@ -22,7 +22,7 @@ export const addWhatsNew = createAsyncThunk(
     'WhatsNew/addWhatsNew',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.addWhatsNew}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.addWhatsNew}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }
@@ -36,7 +36,7 @@ export const deleteWhatsNew = createAsyncThunk(
     'WhatsNew/deleteWhatsNew',
     async (data, thunkAPI) => {
         try {
-            const response = await axios.post(`${BASE_URL}${apiEndPoints.deleteWhatsNew}`, data);
+            const response = await Axios.post(`${BASE_URL}${apiEndPoints.deleteWhatsNew}`, data);
             if (response.status !== 200) {
                 throw new Error('Failed to fetch data');
             }

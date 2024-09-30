@@ -1,146 +1,185 @@
 import React, { useState } from "react";
+import { Box, Button, Card, IconButton, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { Link, useNavigate } from "react-router-dom";
-
-import CustomDialog from "../../component/common/CustomDialog";
+import { useNavigate, Link } from "react-router-dom";
+import { IconPencil, IconTrash } from "@tabler/icons-react";
 import toast from "react-hot-toast";
+import ConfirmDialog from "component/common/ConfirmDialog";
 import {
   useDeleteQuizMutation,
   useGetQuizQuery,
 } from "../../redux/apis/quizapi";
+import Breadcrumbs from "component/common/Breadcrumbs";
 
 const Quiz = () => {
-  const [deleteQuiz] = useDeleteQuizMutation();
+  const navigate = useNavigate();
   const [dialog, setDialog] = useState({
     open: false,
     id: "",
   });
-  const { data: questions = [] } = useGetQuizQuery({
-    id: "",
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 10,
   });
-  const navigatpage = useNavigate();
+
+  const { data: quizData = [], isLoading } = useGetQuizQuery({
+    page: paginationModel.page,
+    pageSize: paginationModel.pageSize,
+  });
+
+  const [deleteQuiz] = useDeleteQuizMutation();
+
   const handleEdit = (id) => {
-    navigatpage(`/editQuiz/${id}`);
+    navigate(`/editQuiz/${id}`);
   };
 
-  const handleconformdelete = async () => {
-    const res = deleteQuiz(dialog.id);
-    toast.promise(res, {
-      loading: "Deleting...",
-      success: <b>Quiz deleted successfully</b>,
-      error: <b>Could not delete. Try again</b>,
-    });
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteQuiz(dialog.id).unwrap();
+      toast.success("Quiz deleted successfully");
+      setDialog({ open: false, id: "" });
+    } catch (error) {
+      toast.error("Failed to delete the quiz");
+    }
+  };
+
+  const openDeleteConfirmation = (id) => {
+    setDialog({ open: true, id });
+  };
+
+  const handleCloseDialog = () => {
     setDialog({ open: false, id: "" });
   };
+
   const columns = [
-    { field: "name", headerName: "Name", width: 200 },
-    { field: "description", headerName: "Description", width: 300 },
+    {
+      field: "name",
+      headerName: "Name",
+      flex: 1,
+      renderCell: ({ row }) => (
+        <Typography sx={{ color: "text.secondary" }}>
+          {row.name || "-"}
+        </Typography>
+      ),
+    },
+    {
+      field: "description",
+      headerName: "Description",
+      flex: 2,
+      renderCell: ({ row }) => (
+        <Typography sx={{ color: "text.secondary" }}>
+          {row.description || "-"}
+        </Typography>
+      ),
+    },
     {
       field: "subject",
       headerName: "Subject",
-      width: 200,
-      renderCell: (params) => <div>{params.row?.subject?.subject_name} </div>,
+      flex: 1,
+      renderCell: (params) => (
+        <Typography sx={{ color: "text.secondary" }}>
+          {params.row?.subject?.subject_name || "-"}
+        </Typography>
+      ),
     },
-    { field: "totalMarks", headerName: "Total Marks", width: 150 },
+    {
+      field: "totalMarks",
+      headerName: "Total Marks",
+      flex: 1,
+      renderCell: ({ row }) => <div>{row.totalMarks || "-"}</div>,
+    },
     {
       field: "isPublished",
       headerName: "Published",
-      width: 150,
-      renderCell: (params) => <div>{params.value ? "Yes" : "No"}</div>,
+      flex: 1,
+      renderCell: (params) => (
+        <Typography sx={{ color: "text.secondary" }}>
+          {params.value ? "Yes" : "No"}
+        </Typography>
+      ),
     },
     {
       field: "actions",
       headerName: "Actions",
-      width: 150,
+      flex: 1,
       renderCell: (params) => (
-        <div>
-          <i
-            className="fa fa-edit theme-fa-icon mr-3"
-            aria-hidden="true"
-            title="Edit Question"
+        <>
+          <IconButton
+            color="primary"
             onClick={() => handleEdit(params.row._id)}
-          ></i>
-
-          <i
-            className="fa fa-trash theme-fa-icon "
-            aria-hidden="true"
-            title="Delete Question"
-            onClick={() => setDialog({ open: true, id: params.row._id })}
-          ></i>
-        </div>
+          >
+            <IconPencil />
+          </IconButton>
+          <IconButton
+            color="error"
+            onClick={() => openDeleteConfirmation(params.row._id)}
+          >
+            <IconTrash />
+          </IconButton>
+        </>
       ),
     },
   ];
-  return (
-    <div className="page-body">
-      <div className="container-fluid">
-        <div className="page-header">
-          <div className="row">
-            <div className="col">
-              <div className="page-header-left">
-                <h3>All Quiz</h3>
-                <ol className="breadcrumb">
-                  <li className="breadcrumb-item">
-                    <Link to="/">
-                      <i
-                        className="fa fa-home theme-fa-icon"
-                        aria-hidden="true"
-                      ></i>
-                    </Link>
-                  </li>
-                  <li className="breadcrumb-item active">All Quiz Listing</li>
-                </ol>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-sm-12 col-xl-12">
-            <div className="row pt-3">
-              <div className="col-md-6">
-                <div className="form-group">
-                  <button
-                    className="btn btn-color"
-                    onClick={() => navigatpage("/addnewquiz")}
-                  >
-                    Add New Quiz
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-sm-12 col-xl-12">
-                <div className="card">
-                  <div className="card-header">
-                    <h5>List of Quiz:</h5>
-                  </div>
-                  <DataGrid
-                    rows={questions?.data}
-                    columns={columns}
-                    pageSize={10}
-                    rowSelection={false}
-                    rowsPerPageOptions={[10, 25, 50, 100]}
-                    getRowId={(row) => row._id}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <CustomDialog
+  const breadcrumbItems = [
+    { label: "Dashboard", link: "/dashboard" },
+    { label: "Quiz" },
+  ];
+
+  return (
+    <Box className="page-body" sx={{ padding: 2 }}>
+      <Breadcrumbs items={breadcrumbItems} />
+
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => navigate("/addnewquiz")}
+      >
+        Add New Quiz
+      </Button>
+
+      <Box sx={{ width: "100%", marginTop: 3 }}>
+        <Card>
+          <DataGrid
+            autoHeight
+            rows={quizData?.data || []}
+            columns={columns}
+            disableRowSelectionOnClick
+            loading={isLoading}
+            pagination
+            paginationMode="server"
+            rowCount={quizData?.total_data || 0}
+            getRowId={(row) => row._id}
+            paginationModel={paginationModel}
+            onPaginationModelChange={setPaginationModel}
+            pageSizeOptions={[10, 25, 50, 100]}
+            localeText={{ noRowsLabel: "No Record(s) Found" }}
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                color: "#000",
+                fontWeight: "bold",
+                fontSize: "16px",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                borderBottom: "2px solid #04aa50",
+              },
+              "& .MuiDataGrid-cell": {
+                display: "flex",
+                alignItems: "center",
+              },
+            }}
+          />
+        </Card>
+      </Box>
+
+      <ConfirmDialog
         open={dialog.open}
-        title="Are you sure you want to delete this Quiz?"
-        onClose={() => setDialog({ open: false, id: "" })}
-        onConfirm={handleconformdelete}
-        confirmText="Confirm"
-        cancelText="Cancel"
-        cancelButtonColor="error"
+        title="Remove Quiz"
+        content="Are you sure you want to remove this quiz?"
+        onClose={handleCloseDialog}
+        onConfirm={handleConfirmDelete}
       />
-    </div>
+    </Box>
   );
 };
 
