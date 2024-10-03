@@ -10,6 +10,8 @@ import {
   Link,
   Card,
   CardContent,
+  Switch,
+  FormControlLabel,
 } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -34,6 +36,7 @@ const ReviewForm = ({ edit = false }) => {
       review: "",
       rating: 2,
       user_profile: "",
+      is_feature: false, // Default value for is_feature
     },
   });
 
@@ -50,10 +53,12 @@ const ReviewForm = ({ edit = false }) => {
 
   useEffect(() => {
     if (isReviewLoaded && edit) {
-      const { name, review, rating, user_profile } = existingReview?.data;
+      const { name, review, rating, user_profile, is_feature } =
+        existingReview?.data;
       setValue("name", name);
       setValue("review", review);
       setValue("rating", rating);
+      setValue("is_feature", is_feature || false);
       setPreview(user_profile || null);
     }
   }, [isReviewLoaded, existingReview, edit, setValue]);
@@ -75,6 +80,7 @@ const ReviewForm = ({ edit = false }) => {
     formData.append("name", data.name);
     formData.append("review", data.review);
     formData.append("rating", data.rating);
+    formData.append("is_feature", data.is_feature);
     if (selectedImage) {
       formData.append("user_profile", selectedImage);
     }
@@ -220,6 +226,26 @@ const ReviewForm = ({ edit = false }) => {
                   />
                 </Box>
               )}
+            </Box>
+
+            {/* Is Feature Switch */}
+            <Box sx={{ marginBottom: 2 }}>
+              <FormControlLabel
+                control={
+                  <Controller
+                    name="is_feature"
+                    control={control}
+                    render={({ field }) => (
+                      <Switch
+                        {...field}
+                        checked={field.value}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                      />
+                    )}
+                  />
+                }
+                label="Feature Review"
+              />
             </Box>
 
             {/* Submit Button */}
